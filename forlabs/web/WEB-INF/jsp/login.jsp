@@ -15,26 +15,27 @@
 
 
     <c:set var="from" scope="session">
-        <fmt:bundle basename='resources.config'><fmt:message key='path.page.login' /></fmt:bundle>
+        <fmt:bundle basename='resources.routing'><fmt:message key='path.page.login' /></fmt:bundle>
     </c:set>
 
+    <c:set var="context" value="${pageContext.request.contextPath}"> </c:set>
 
 
     <html>
     <head>
         <title><fmt:message key="login.title" /></title>
 
-        <link href="../css/auth_style.css" rel="stylesheet" type="text/css" />
-        <link href="../css/style.css" rel="stylesheet" type="text/css" />
+        <link href="${context}/css/auth_style.css" rel="stylesheet" type="text/css" />
+        <link href="${context}/css/style.css" rel="stylesheet" type="text/css" />
         <link rel="icon" href="https://github.com/fluidicon.png" type="image/x-icon"/>
 
     </head>
 
     <body>
-    <script src="/js/scripts.js"  type="text/javascript"></script>
+    <script src="${context}/js/scripts.js"  type="text/javascript"></script>
 
     <div>
-        <form name="LocaleForm" action="/pages" method="post">
+        <form name="LocaleForm" action="/site" method="get">
             <a href="#" onclick="setHiddenBeBY();">BY</a> | <a  href="#" onclick="setHiddenEnUs();">ENG</a>
             <input type="hidden" name="localeStrI" value=""/>
             <input type="hidden" name="command" value="changeLocale"/>
@@ -43,7 +44,7 @@
 
 
     <div id="login">
-        <form name="LoginForm" action="/pages/" method="post">
+        <form name="LoginForm" action="/site" method="post">
             <fieldset class="clearfix">
 
                 <fmt:message key="login.placeholder.login" var="loginPlaceholderLogin"/>
@@ -65,6 +66,12 @@
                     <c:remove var="nullPage" scope="session" />
                 </c:if>
 
+                <c:if test="${ not empty sessionScope.notAuthorised}">
+                    <p class="server-text"><fmt:bundle basename="resources.messages"><fmt:message key="message.notauthorised"/></fmt:bundle> </p>
+                    <c:remove var="notAuthorised" scope="session" />
+                </c:if>
+
+                </br>
 
                 <p><input type="submit" value='<fmt:message key="login.button.enter" />'/></p>
                 <input type="hidden" name="command" value="login" />

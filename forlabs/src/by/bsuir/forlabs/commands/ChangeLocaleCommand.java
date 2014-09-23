@@ -26,6 +26,6 @@ public class ChangeLocaleCommand implements Command {
         session.setAttribute("localeObj", localeObj);
 
         //System.out.println("locale" + request.getParameter("locale"));
-        return (String)request.getSession().getAttribute("from"); //if user kill session, param will be null and it will return to login page
+        return (String)request.getSession().getAttribute("from");
     }
 }

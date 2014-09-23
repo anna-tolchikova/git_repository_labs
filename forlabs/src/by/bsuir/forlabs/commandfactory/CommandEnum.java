@@ -1,9 +1,6 @@
 package by.bsuir.forlabs.commandfactory;
 
-import by.bsuir.forlabs.commands.ChangeLocaleCommand;
-import by.bsuir.forlabs.commands.Command;
-import by.bsuir.forlabs.commands.LoginCommand;
-import by.bsuir.forlabs.commands.LogoutCommand;
+import by.bsuir.forlabs.commands.*;
 
 public enum CommandEnum {
 
@@ -20,6 +17,31 @@ public enum CommandEnum {
     CHANGELOCALE {
         {
             this.command = new ChangeLocaleCommand();
+        }
+    },
+    INDEX_ERROR404 {
+        {
+            this.command = new IndexError404Command();
+        }
+    },
+    INDEX_EXCEPTION {
+        {
+            this.command = new IndexExceptionCommand();
+        }
+    },
+    INDEX_LOGIN {
+        {
+            this.command = new IndexLoginCommand();
+        }
+    },
+    INDEX_ADMIN_HOME {
+        {
+            this.command = new IndexAdminHomeCommand();
+        }
+    },
+    INDEX_CLIENT_HOME {
+        {
+            this.command = new IndexClientHomeCommand();
         }
     };
 

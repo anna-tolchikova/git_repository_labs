@@ -2,8 +2,8 @@ package by.bsuir.forlabs.commands;
 
 import by.bsuir.forlabs.exceptions.LogicalException;
 import by.bsuir.forlabs.logic.LoginLogic;
-import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.resourcesmanagers.MessageManager;
+import by.bsuir.forlabs.resourcesmanagers.RoutingManager;
 import by.bsuir.forlabs.subjects.User;
 import org.apache.log4j.Logger;
 
@@ -22,6 +22,8 @@ public class LoginCommand implements Command {
 
     private static final String PARAM_NAME_LOGIN = "login";
     private static final String PARAM_NAME_PASSWORD = "password";
+    private static final int ADMIN_ROLE_CODE = 1;
+    private static final int CLIENT_ROLE_CODE = 2;
 
     @Override
     public String execute(HttpServletRequest request) {
@@ -32,18 +34,26 @@ public class LoginCommand implements Command {
 
         try {
             User user;
-            if ((user = LoginLogic.checkLogin(login, pass)) != null) {
+
+            // check if user is logged on
+
+            if ((user =  (User)request.getSession().getAttribute("user")) == null) {
+                if ( (user = LoginLogic.checkLogin(login, pass)) == null){
+                    request.getSession().setAttribute("errorLoginPassMessage",
+                            new MessageManager((Locale) request.getSession().getAttribute("localeObj")).getProperty("message.loginerror"));
+                    page = RoutingManager.getProperty("path.page.login");
+                }
+
+            }
+            if (user != null) {
                 request.getSession().setAttribute("user", user);
-                if (user.getIdRole() == 1) {
-                    page = ConfigurationManager.getProperty("path.page.admin.home");
+                if (user.getIdRole() == ADMIN_ROLE_CODE) {
+
+                    page = RoutingManager.getProperty("path.page.admin.home");
                 }
-                if (user.getIdRole() == 2) {
-                    page = ConfigurationManager.getProperty("path.page.client.home");
+                if (user.getIdRole() == CLIENT_ROLE_CODE) {
+                    page = RoutingManager.getProperty("path.page.client.home");
                 }
-            } else {
-                request.getSession().setAttribute("errorLoginPassMessage",
-                        new MessageManager((Locale) request.getSession().getAttribute("localeObj")).getProperty("message.loginerror"));
-                page = ConfigurationManager.getProperty("path.page.login");
             }
         } catch (LogicalException e) {
             printEx(e);

@@ -15,6 +15,10 @@ public abstract class AbstractDao <K, T extends Entity> {
 
     protected WrapperConnector connector;
 
+    public AbstractDao() {
+
+    }
+
     public AbstractDao(WrapperConnector connector) {
         this.connector = connector;
     }

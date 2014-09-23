@@ -2,8 +2,16 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-           version="3.0">
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+           version="2.5" metadata-complete="true">
+
+
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/functions</taglib-uri>
+            <taglib-location>/WEB-INF/functions.tld</taglib-location>
+        </taglib>
+    </jsp-config>
 
     <context-param>
         <param-name>localeStr</param-name>
@@ -29,7 +37,7 @@
 
     <servlet-mapping>
         <servlet-name>ControlServlet</servlet-name>
-        <url-pattern>/pages/*</url-pattern>
+        <url-pattern>/site/*</url-pattern>
     </servlet-mapping>
 
     <session-config>
@@ -37,25 +45,26 @@
     </session-config>
 
     <welcome-file-list>
-        <welcome-file>jsp/login.jsp</welcome-file>
+        <welcome-file>/WEB-INF/jsp/login.jsp</welcome-file>
     </welcome-file-list>
 
 
     <!-- error pages -->
     <error-page>
         <error-code>404</error-code>
-        <location>/jsp/errors/error404.jsp</location>
+        <location>/site/error404</location>
     </error-page>
 
     <error-page>
         <error-code>500</error-code>
-        <location>/jsp/errors/exceptions.jsp</location>
+        <location>/site/exception</location>
     </error-page>
 
     <!-- error pages end-->
 
 
     <!-- filters -->
+
     <filter>
         <filter-name>encodingfilter</filter-name>
         <filter-class>by.bsuir.forlabs.filters.EncodingFilter</filter-class>
@@ -67,22 +76,63 @@
 
     <filter-mapping>
         <filter-name>encodingfilter</filter-name>
-        <url-pattern>/jsp</url-pattern>
+        <url-pattern>/site/*</url-pattern>
     </filter-mapping>
-    <!--
-        <filter>
-            <filter-name>pageredirectsecurityfilter</filter-name>
-            <filter-class> by.bsuir.forlabs.filters.PageRedirectSecurityFilter</filter-class>
-            <init-param>
-                <param-name>ERROR_PATH</param-name>
-                <param-value>/errors/error404.jsp</param-value>
-            </init-param>
-        </filter>
 
-        <filter-mapping>
-            <filter-name>pageredirectsecurityfilter</filter-name>
-            <url-pattern>/jsp/*</url-pattern>
-        </filter-mapping>-->
-         <!--filters end-->
+    <!-- encoding filter end-->
+
+    <filter>
+        <filter-name>authoriseduserfilter</filter-name>
+        <filter-class>by.bsuir.forlabs.filters.AuthorisedUserFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>authoriseduserfilter</filter-name>
+        <url-pattern>/site/*</url-pattern>
+    </filter-mapping>
+
+    <!-- authoriseduserfilter filter end-->
+
+    <filter>
+        <filter-name>loginpagefilter</filter-name>
+        <filter-class>by.bsuir.forlabs.filters.LoginPageFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>loginpagefilter</filter-name>
+        <url-pattern>/site/login</url-pattern>
+    </filter-mapping>
+
+    <!-- loginpagefilter filter end-->
+
+
+    <filter>
+        <filter-name>adminpermissionfilter</filter-name>
+        <filter-class>by.bsuir.forlabs.filters.AdminPermissionFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>adminpermissionfilter</filter-name>
+        <url-pattern>/site/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- adminpermissionfilter filter end-->
+
+    <filter>
+        <filter-name>clientpermissionfilter</filter-name>
+        <filter-class>by.bsuir.forlabs.filters.ClientPermissionFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>clientpermissionfilter</filter-name>
+        <url-pattern>/site/client/*</url-pattern>
+    </filter-mapping>
+
+    <!-- clientpermissionfilter filter end-->
+
+    <!-- filters end -->
+
+
+
 
 </web-app>

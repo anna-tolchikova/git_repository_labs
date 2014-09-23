@@ -1,7 +1,9 @@
 package by.bsuir.forlabs.filters;
 
-/*
-фильтр, корректирующий кодировку запроса и ответа
+/**
+ * map on site/*
+ * is called first
+ * corrects request and response encoding
  */
 
 import org.apache.log4j.Logger;

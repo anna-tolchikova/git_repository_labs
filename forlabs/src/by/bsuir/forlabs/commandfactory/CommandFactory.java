@@ -13,9 +13,12 @@ public class CommandFactory {
 
         Command current = new EmptyCommand();
 
-        String action = request.getParameter("command");
-        if (action == null || action.isEmpty()) {           // если команда не задана в текущем запросе
-            return current;
+
+        String action;
+        if ((action = request.getParameter("command")) == null || action.isEmpty()) {  // если команда не задана в текущем запросе
+            if (( action = (String)request.getAttribute("command")) == null || action.isEmpty()) {
+                return current;
+            }
         }
 
         try {                                               // получение объекта, соответствующего команде

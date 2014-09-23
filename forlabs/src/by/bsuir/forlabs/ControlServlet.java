@@ -6,7 +6,6 @@ import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,12 +36,14 @@ public class ControlServlet extends HttpServlet {
             throw new RuntimeException("Error servlet initialization. ", e);
         }
     }
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, NamingException {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String page = null;
-        CommandFactory client = new CommandFactory();
-        Command command = client.defineCommand(request); // request must contain param "command"
+        CommandFactory factory = new CommandFactory();
+        Command command = factory.defineCommand(request);
+
+        log.info("\t POST");
         log.info("\t request uri (from request): " + request.getRequestURI()); // a String containing the part of the URL from the protocol name up to the query string
         log.info("\t request path info (from request): " + request.getPathInfo()); // a String, decoded by the web container, specifying extra path information that comes after the servlet path but before the query string in the request URL; or null if the URL does not have any extra path information
         log.info("\t context path (from servlet): " + getServletContext().getContextPath());
@@ -50,47 +51,56 @@ public class ControlServlet extends HttpServlet {
         log.info("\t servlet path (from request): " + request.getServletPath());
         log.info("\t servlet info (from servlet): " + this.getServletInfo());
         log.info("\t session id (from request): " + request.getSession().getId());
-
         log.info("command = " + command);
 
-        page = command.execute(request);
+        page = command.execute(request);   // пути как в роутинге
 
         log.info("page after execute command = " + page);
-        if (page != null) {
-            if (page.equals(request.getPathInfo())) {
-                log.info("forward to page = " + page + " requestURI = " + request.getRequestURI());
-                request.getRequestDispatcher(page).forward(request, response);
-            } else {
 
-                log.info("redirect to page = " + page);
-                response.sendRedirect(page); // We'd like to fire redirect in case of a view change as result of the action (PRG pattern).
-            }
+        if (page != null) {
+            log.info("redirect to page = " + page);
+            response.sendRedirect(page);
         }
         else {
-            // execute возвращает null в случае пустой команды
-
+//            execute возвращает null в случае пустой команды
             request.getSession().removeAttribute("user");
             page = ConfigurationManager.getProperty("path.page.login");
 //            response.sendRedirect(getServletContext().getContextPath() + page); ???? в чем фишка
             response.sendRedirect(page);
         }
-
-
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (NamingException e) {
-            log.error(e.getMessage());
-        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (NamingException e) {
-            log.error(e.getMessage());
+        log.info("\t GET");
+        String page = null;
+        CommandFactory factory = new CommandFactory();
+
+        String[] pathParts = request.getPathInfo().split("/");
+        String commandStr = "index";
+        for (int i = 1 ; i < pathParts.length ; ++i) {
+            commandStr += "_" + pathParts[i];
+        }
+        request.setAttribute("command", commandStr);
+
+        log.info("commandStr (from request)= " + request.getAttribute("command"));
+
+        Command command = factory.defineCommand(request);
+        page = command.execute(request);  // получаем страницу с WEB-INF
+
+        log.info("page after execute command = " + page);
+
+        if (page != null) {
+            log.info("forward to page = " + page);
+            request.getRequestDispatcher(page).forward(request, response);
+        }
+        else {
+//            execute возвращает null в случае пустой команды
+            request.getSession().removeAttribute("user");
+            page = ConfigurationManager.getProperty("path.page.error404");
+            request.getRequestDispatcher(page).forward(request, response);
+
+//            response.sendRedirect(getServletContext().getContextPath() + page); ???? в чем фишка
+//            response.sendRedirect(page);
         }
     }
 

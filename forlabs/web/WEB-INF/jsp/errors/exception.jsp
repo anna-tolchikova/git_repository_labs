@@ -24,7 +24,7 @@
           с которой был выполнен переход на текущую
 --%>
 <c:set var="from" scope="session">
-    <fmt:bundle basename='resources.config'><fmt:message key='path.page.error' /></fmt:bundle>
+    <fmt:bundle basename='resources.routing'><fmt:message key='path.page.exception' /></fmt:bundle>
 </c:set>
 
 <html>
@@ -39,19 +39,28 @@
 <h1><fmt:message key="errorpage.h1.head" /></h1>
 <h2><fmt:message key="errorpage.h2.description" /></h2>
 <c:if test="${not empty oldFrom}">
-    <a href="<c:url value='${oldFrom}'/>"  style="width: 210px;">
+    <a href="<c:url value='${oldFrom}'/>"  style="width: 250px; display: inline-block;">
         <fmt:message key="errorpage.a.previous" />
     </a>
 </c:if>
 
 <c:choose>
     <c:when test="${not empty sessionScope.user}">
-        <a href='/WEB-INF<fmt:bundle basename="resources.config"><fmt:message key="path.page.start" /></fmt:bundle>'  style="width: 210px;">
-            <fmt:message key="errorpage.a.startpage" />
-        </a>
+        <c:if test="${sessionScope.user.idRole == 1}">
+
+            <a href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home' /></fmt:bundle>"  style="width: 210px;">
+                <fmt:message key="errorpage.a.homepage" />
+            </a>
+        </c:if>
+        <c:if test="${sessionScope.user.idRole == 2}">
+
+            <a href='<fmt:bundle basename="resources.routing"><fmt:message key="path.page.client.home" /></fmt:bundle>'  style="width: 210px;">
+                <fmt:message key="errorpage.a.homepage" />
+            </a>
+        </c:if>
     </c:when>
     <c:otherwise>
-        <a href='/WEB-INF<fmt:bundle basename="resources.config"><fmt:message key="path.page.login" /></fmt:bundle>'  style="width: 210px;">
+        <a href='<fmt:bundle basename="resources.routing"><fmt:message key="path.page.login" /></fmt:bundle>'  style="width: 210px;">
             <fmt:message key="errorpage.a.loginpage" />
         </a>
     </c:otherwise>
