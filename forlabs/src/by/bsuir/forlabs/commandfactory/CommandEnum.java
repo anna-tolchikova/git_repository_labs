@@ -38,6 +38,10 @@ public enum CommandEnum {
         {
             this.command = new IndexAdminHomeCommand();
         }
+    },INDEX_ADMIN_APPLICATION {
+        {
+            this.command = new IndexAdminApplicationCommand();
+        }
     },
     INDEX_CLIENT_HOME {
         {

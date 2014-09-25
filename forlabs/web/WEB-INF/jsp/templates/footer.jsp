@@ -1,0 +1,50 @@
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+
+
+<!-- jQuery Version 1.11.1 there is local version-->
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="${context}/js/bootstrap.min.js"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="${context}/js/plugins/metisMenu/metisMenu.min.js"></script>
+
+<!-- DataTables JavaScript -->
+<script src="${context}/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="${context}/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="${context}/js/sb-admin-2.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var t = $('#newApplicationsTable').DataTable( {
+            "columnDefs": [ {
+                "searchable": false,
+                "orderable": false,
+                "targets": 0
+            } ],
+            "order": [[ 3, 'asc' ]]
+        } );
+
+        t.on( 'order.dt search.dt', function () {
+            t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+        } ).draw();
+    } );
+</script>
+
+<script>
+    function setHiddenBeBY(){
+        document.all.localeStrI.value="be_BY";
+        document.LocaleForm.submit();
+    }
+    function setHiddenEnUs(){
+        document.all.localeStrI.value="en_US";
+        document.LocaleForm.submit();
+    }
+</script>

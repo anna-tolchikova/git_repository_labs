@@ -19,13 +19,10 @@
 
 <%--
 в сессию устанавливается параметр from - текущая страница, с которой будет переход.
-в request param (устанавливается при необходимости возврата на предыдущую страницу)
-          в это время хранится параметр from - страница,
-          с которой был выполнен переход на текущую
 --%>
-<c:set var="from" scope="session">
-    <fmt:bundle basename='resources.routing'><fmt:message key='path.page.exception' /></fmt:bundle>
-</c:set>
+<c:url var="fromUrl" value="${requestScope['javax.servlet.forward.request_uri']}"/>
+<c:set var="from" value="${fromUrl}" scope="session"/>
+
 
 <html>
 <head>
@@ -68,16 +65,16 @@
 
 <c:if test="${not empty pageContext.errorData}">
     </br>
-    Request from ${pageContext.errorData.requestURI} is failed
+    Request from <c:out value="${pageContext.errorData.requestURI}"/> is failed
     <br/>
-    Servlet name or type: ${pageContext.errorData.servletName}
+    Servlet name or type:  <c:out value="${pageContext.errorData.servletName}"/>
     <br/>
-    Status code: ${pageContext.errorData.statusCode}
+    Status code:  <c:out value="${pageContext.errorData.statusCode}"/>
     <br/>
-    Exception: ${pageContext.errorData.throwable}
+    Exception:  <c:out value="${pageContext.errorData.throwable}"/>
 
     <br/>
-    Exception cause: ${pageContext.errorData.throwable.cause}
+    Exception cause:  <c:out value="${pageContext.errorData.throwable.cause}"/>
     <br/>
     Exception trace:
     <br/>

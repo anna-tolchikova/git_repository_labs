@@ -62,16 +62,19 @@ public class ControlServlet extends HttpServlet {
             response.sendRedirect(page);
         }
         else {
-//            execute возвращает null в случае пустой команды
-            request.getSession().removeAttribute("user");
+//          execute возвращает null в случае пустой команды
+            request.getSession().removeAttribute("user");  // не. надо. наказание за неверный постинг | наверное не стоит... пока можно так. потом - отправлять на 404 страницу? или на логин..
             page = ConfigurationManager.getProperty("path.page.login");
-//            response.sendRedirect(getServletContext().getContextPath() + page); ???? в чем фишка
+//            response.sendRedirect(getServletContext().getContextPath() + page); ?? в чем фишка
             response.sendRedirect(page);
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.info("\t GET");
+        log.info(" request = " + request.getRequestURI() + "?" + request.getQueryString());
+
+
         String page = null;
         CommandFactory factory = new CommandFactory();
 
@@ -95,7 +98,7 @@ public class ControlServlet extends HttpServlet {
         }
         else {
 //            execute возвращает null в случае пустой команды
-            request.getSession().removeAttribute("user");
+//            request.getSession().removeAttribute("user");
             page = ConfigurationManager.getProperty("path.page.error404");
             request.getRequestDispatcher(page).forward(request, response);
 

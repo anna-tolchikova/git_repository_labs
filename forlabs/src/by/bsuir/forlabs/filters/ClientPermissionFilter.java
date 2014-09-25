@@ -44,8 +44,7 @@ public class ClientPermissionFilter implements Filter {
         else {
             log.info("user has not client rights");
 
-            request.getSession().setAttribute("noRights", 1);
-            response.sendRedirect(RoutingManager.getProperty("path.page.error404"));
+            response.sendRedirect(RoutingManager.getProperty("path.page.error403"));
         }
     }
 

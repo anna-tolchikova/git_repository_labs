@@ -14,20 +14,12 @@
 
 <html>
 <head>
-    <title><fmt:message key='errorpage.404.title' /></title>
+    <title><fmt:message key='errorpage.403.title' /></title>
 </head>
 <body>
 
-<h1> <fmt:message key='errorpage.404.h1' /> </h1>
+<h1> <fmt:message key='errorpage.403.h1' /> </h1>
 
-
-<c:if test="${not empty noRights}">
-
-    <p><fmt:bundle basename="resources.messages"><fmt:message key="message.norights"/></fmt:bundle> </p>
-    <c:remove var="noRights" scope="session" />
-</c:if>
-
-</br>
 
 <c:if test="${not empty oldFrom}">
 
@@ -58,6 +50,6 @@
     </c:otherwise>
 </c:choose>
 
-<% request.getServletContext().log("JSP: error404");%>
+<% request.getServletContext().log("JSP: error403");%>
 </body>
 </html>

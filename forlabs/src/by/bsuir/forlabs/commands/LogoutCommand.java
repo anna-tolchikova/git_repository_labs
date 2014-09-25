@@ -1,6 +1,6 @@
 package by.bsuir.forlabs.commands;
 
-import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
+import by.bsuir.forlabs.resourcesmanagers.RoutingManager;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LogoutCommand implements Command {
     @Override
     public String execute(HttpServletRequest request) {
-        String page = ConfigurationManager.getProperty("path.page.login");
+        String page = RoutingManager.getProperty("path.page.login");
         // уничтожение сессии
         request.getSession().invalidate();
         return page;
