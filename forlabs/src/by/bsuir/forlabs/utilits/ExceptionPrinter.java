@@ -8,9 +8,13 @@ public class ExceptionPrinter {
 
     public static void printEx(Throwable ex){
         Throwable tmp = ex;
-        do{
-            tmp = tmp.getCause();
-        } while(tmp.getCause() != null);
+
+        if (tmp.getCause() != null) {
+            do {
+                tmp = tmp.getCause();
+            } while (tmp.getCause() != null);
+        }
+
         log.error("--------------------");
         log.error(tmp);
         for (int i = 0; i < tmp.getStackTrace().length - 5; ++i){

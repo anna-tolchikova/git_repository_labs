@@ -5,24 +5,26 @@ import by.bsuir.forlabs.connectionpool.WrapperConnector;
 import by.bsuir.forlabs.dao.ClientRequestDao;
 import by.bsuir.forlabs.exceptions.DaoException;
 import by.bsuir.forlabs.exceptions.LogicalException;
-import by.bsuir.forlabs.subjects.ClientRequest;
+import by.bsuir.forlabs.subjects.composers.Composed;
 
 import java.util.ArrayList;
 
 public class ClientRequestsLogic {
 
-    private static final int NEW_REQUEST_STATUS_CODE = 1;
-    private static final int DAMAGED_STATUS_CODE = 6;
+    private final static int NEW_REQUESTS_STATUS = 1;
+    private final static int ACCEPTED_REQUESTS_STATUS = 2;
+    private final static int PAYED_REQUESTS_STATUS = 4;
+    private final static int DAMAGED_REQUESTS_STATUS = 6;
 
-    public static ArrayList<ClientRequest> findShortNewRequests() throws LogicalException {
+    public static ArrayList<Composed> findNewRequests() throws LogicalException {
 
-        ArrayList<ClientRequest> newRequests = null;
+        ArrayList<Composed> newRequests = null;
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
         ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
-            newRequests = clientRequestDao.findShortByStatus(NEW_REQUEST_STATUS_CODE);
+            newRequests = clientRequestDao.findByStatus(NEW_REQUESTS_STATUS);
 
         } catch (DaoException e) {
             throw new LogicalException(e);
@@ -33,15 +35,14 @@ public class ClientRequestsLogic {
         return newRequests;
     }
 
-
-    public static ArrayList<ClientRequest>  findShortCarsForRepair () throws LogicalException {
-        ArrayList<ClientRequest> carsForRepair = null;
+    public static ArrayList<Composed> findExpiredRequests() throws LogicalException {
+        ArrayList<Composed> carsForRepair = null;
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
         ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
-            carsForRepair = clientRequestDao.findShortByStatus(DAMAGED_STATUS_CODE);
+            carsForRepair = clientRequestDao.findByStatus(ACCEPTED_REQUESTS_STATUS);
 
         } catch (DaoException e) {
             throw new LogicalException(e);
@@ -52,5 +53,44 @@ public class ClientRequestsLogic {
 
         return carsForRepair;
     }
+
+    public static ArrayList<Composed> findNotReturnedRequests() throws LogicalException {
+        ArrayList<Composed> carsForRepair = null;
+        ConnectionPool pool = ConnectionPool.getInstance();
+        WrapperConnector wc = pool.getConnection();
+        ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
+
+        try {
+            carsForRepair = clientRequestDao.findByStatus(PAYED_REQUESTS_STATUS);
+
+        } catch (DaoException e) {
+            throw new LogicalException(e);
+        } finally {
+            pool.releaseConnection(wc);
+        }
+
+
+        return carsForRepair;
+    }
+
+    public static ArrayList<Composed> findDamagedRequests() throws LogicalException {
+        ArrayList<Composed> carsForRepair = null;
+        ConnectionPool pool = ConnectionPool.getInstance();
+        WrapperConnector wc = pool.getConnection();
+        ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
+
+        try {
+            carsForRepair = clientRequestDao.findByStatus(DAMAGED_REQUESTS_STATUS);
+
+        } catch (DaoException e) {
+            throw new LogicalException(e);
+        } finally {
+            pool.releaseConnection(wc);
+        }
+
+
+        return carsForRepair;
+    }
+
 
 }

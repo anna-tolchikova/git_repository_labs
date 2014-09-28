@@ -1,12 +1,10 @@
 package by.bsuir.forlabs.commandfactory;
 
 import by.bsuir.forlabs.commands.Command;
-import by.bsuir.forlabs.commands.EmptyCommand;
-import by.bsuir.forlabs.resourcesmanagers.MessageManager;
+import by.bsuir.forlabs.commands.common.EmptyCommand;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 public class CommandFactory {
 
@@ -29,8 +27,6 @@ public class CommandFactory {
             current = currentEnum.getCurrentCommand();
         } catch (IllegalArgumentException e) {
             log.error("unknown command :" + e);
-            request.getSession().setAttribute("wrongAction", new MessageManager((Locale)request.getSession().getAttribute("localeObj")).getProperty("message.wrongaction"));
-
         }
         return current;
     }

@@ -5,18 +5,14 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@ taglib prefix="fc" uri="/functions"%>
+<%@ taglib prefix="ctg" uri="/customtags"%>
 
 
 <c:set var="localeStr" value="${ not empty sessionScope['localeStr']  ? sessionScope['localeStr'] : initParam['localeStr']}"/>
 <fmt:setLocale value="${localeStr}" />
 <fmt:setBundle basename="resources.text" />
 
-
-<c:url var="fromUrl" value="${requestScope['javax.servlet.forward.request_uri']}">
-    <c:param name="id" value="${param.id}"/>
-</c:url>
-<c:set var="from" value="${fromUrl}" scope="session"/>
-
+<c:set var="servletMap" value="${initParam['map']}" />
 
 <c:set var="context" value="${pageContext.request.contextPath}"> </c:set>
 
@@ -73,21 +69,25 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home' /></fmt:bundle>"><fmt:message key="admin.servicetitile"/></a>
+                    <a class="navbar-brand" href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home' /></fmt:bundle>">
+                        <strong>
+                            <fmt:message key="admin.servicetitile"/>
+                        </strong>
+                    </a>
                 </div>
 
-                <ul class="nav navbar-top-links navbar-right">
+                <ul class="nav navbar-top-links navbar-right"  style="margin-top: 15px;">
                     <li>
-                        <form name="LocaleForm" action="${sessionScope.from}" method="post">
+                        <form name="LocaleForm" action="${servletMap}" method="post">
                             <a href="#" onclick="setHiddenBeBY();">BY</a> | <a  href="#" onclick="setHiddenEnUs();">ENG</a>
-                            <input type="hidden" name="id" value="${param.id}">
                             <input type="hidden" name="localeStrI" value=""/>
                             <input type="hidden" name="command" value="changeLocale"/>
+                            <ctg:localeForm />
                         </form>
                     </li>
                     <li class="dropdown">
 
-                        <form  name="LogoutForm" action="/site" method="post">
+                        <form  name="LogoutForm" action="${servletMap}" method="post">
                             <a href="#" onclick="document.LogoutForm.submit(); return false;"><i class="fa fa-sign-out fa-fw"></i> <fmt:message key="admin.logout"/></a>
                             <input type="hidden" name="command" value="logout"/>
                         </form>
@@ -129,14 +129,152 @@
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
-            <!-- /.row -->
+                <!-- /.row -->
+
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <fmt:message key="admin.application.infopanel.title"/>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.col-lg-8 -->
+                        </div>
+                        <!-- /.row -->
+
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="panel panel-warning">
+                                    <div class="panel-heading">
+                                        Yellow Panel
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- /.col-lg-8 -->
+                        </div>
+                        <!-- /.row -->
+
+                        <div class="panel-group" id="accordion">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Collapsible Group Item #1</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseOne" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.collapse panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Collapsible Group Item #2</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwo" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.collapse panel -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">Collapsible Group Item #3</a>
+                                    </h4>
+                                </div>
+                                <div id="collapseThree" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.collapse panel -->
+                        </div>
+                        <!-- /.collaps-panels group -->
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+
             </div>
             <!-- /#page-wrapper -->
 
         </div>
         <!-- /#wrapper -->
 
-        <jsp:directive.include file=""/>
+
+        <!-- my scripts-- >
+        <script src="${context}/js/scripts.js"></script>
+
+        <!-- jQuery Version 1.11.1 there is local version-->
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="${context}/js/bootstrap.min.js"></script>
+
+        <!-- Metis Menu Plugin JavaScript -->
+        <script src="${context}/js/plugins/metisMenu/metisMenu.min.js"></script>
+
+        <!-- DataTables JavaScript -->
+        <script src="${context}/js/plugins/dataTables/jquery.dataTables.js"></script>
+        <script src="${context}/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="${context}/js/sb-admin-2.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                var t = $('#newApplicationsTable').DataTable( {
+                    "columnDefs": [ {
+                        "searchable": false,
+                        "orderable": false,
+                        "targets": [0,5]
+                    } ],
+                    "order": [[ 3, 'asc' ]]
+                } );
+
+                t.on( 'order.dt search.dt', function () {
+                    t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                        cell.innerHTML = i+1;
+                    } );
+                } ).draw();
+            } );
+        </script>
+
+        <script>
+            function setHiddenBeBY(){
+                document.all.localeStrI.value="be_BY";
+                document.LocaleForm.submit();
+            }
+            function setHiddenEnUs(){
+                document.all.localeStrI.value="en_US";
+                document.LocaleForm.submit();
+            }
+        </script>
+
 
     </body>
 </html>

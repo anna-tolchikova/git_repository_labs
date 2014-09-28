@@ -3,6 +3,9 @@ package by.bsuir.forlabs.dao;
 import by.bsuir.forlabs.connectionpool.WrapperConnector;
 import by.bsuir.forlabs.exceptions.DaoException;
 import by.bsuir.forlabs.subjects.ClientRequest;
+import by.bsuir.forlabs.subjects.Specification;
+import by.bsuir.forlabs.subjects.composers.Composed;
+import by.bsuir.forlabs.subjects.composers.ComposedRequestSpecification;
 import org.apache.log4j.Logger;
 
 import java.sql.PreparedStatement;
@@ -15,14 +18,38 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
 
     private static Logger log = Logger.getLogger(ClientRequestDao.class);
 
+    private final static int NEW_REQUESTS_STATUS = 1;
+    private final static int ACCEPTED_REQUESTS_STATUS = 2;
+    private final static int PAYED_REQUESTS_STATUS = 4;
+    private final static int DAMAGED_REQUESTS_STATUS = 6;
+
     private final static String SQL_SELECT_REQUEST_BY_STATUS = "select * from request where idStatus = ?";
-    private final static String SQL_SHORT_SELECT_NEW_REQUESTS = "select " +
-            "request.id, request.firstName, request.lastName, request.rentalDate, request.rentalPeriod, specifications.model " +
+    private final static String SQL_SELECT_NEW_REQUESTS = "select * " +
             "from request " +
             "inner join specifications " +
             "where request.id = specifications.id " +
-            "and request.idStatus = ? ";
+            "and idStatus = ? ";
 
+    private final static String SQL_SELECT_EXPIRED_REQUESTS = "select *" +
+            "from request " +
+            "inner join specifications " +
+            "where request.id = specifications.id " +
+            "and idStatus = ? " +
+            "and CURDATE() >= rentalDate";
+
+    private final static String SQL_SELECT_NOT_RETURNED_CARS = "select *," +
+            "DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY) as 'expectedReturnDate'" +
+            "from request " +
+            "inner join specifications " +
+            "where request.id = specifications.id " +
+            "and idStatus = ? " +
+            "and CURDATE() > DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY)";
+
+    private final static String SQL_SELECT_DAMAGED_CARS = "select *" +
+            "from request " +
+            "inner join specifications " +
+            "where request.id = specifications.id " +
+            "and idStatus = ? ";
 
     public ClientRequestDao(WrapperConnector connector) {
         super(connector);
@@ -59,12 +86,30 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
     }
 
 
-    public ArrayList<ClientRequest> findShortByStatus(int statusCode) throws DaoException {
-        ArrayList<ClientRequest> newRequests = new ArrayList<ClientRequest>();
+    public ArrayList<Composed> findByStatus(int statusCode) throws DaoException {
+        ArrayList<Composed> requests = new ArrayList<Composed>();
 
         PreparedStatement st = null;
         try {
-            st = connector.prepareStatement(SQL_SHORT_SELECT_NEW_REQUESTS);
+            switch (statusCode) {
+                case NEW_REQUESTS_STATUS:
+                    st = connector.prepareStatement(SQL_SELECT_NEW_REQUESTS);
+                    log.info("SQL_SELECT_NEW_REQUESTS");
+                    break;
+                case ACCEPTED_REQUESTS_STATUS:
+                    st = connector.prepareStatement(SQL_SELECT_EXPIRED_REQUESTS);
+                    log.info("SQL_SELECT_EXPIRED_REQUESTS");
+                    break;
+                case PAYED_REQUESTS_STATUS:
+                    st = connector.prepareStatement(SQL_SELECT_NOT_RETURNED_CARS);
+                    log.info("SQL_SELECT_NOT_RETURNED_CARS");
+                    break;
+                case DAMAGED_REQUESTS_STATUS:
+                    st = connector.prepareStatement(SQL_SELECT_DAMAGED_CARS);
+                    log.info("SQL_SELECT_DAMAGED_CARS");
+                    break;
+
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -72,25 +117,34 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
         try {
             st.setInt(1, statusCode);
             ResultSet rs = st.executeQuery();
-            int newRequestsCount = 0;
             while (rs.next()) {
-                ++newRequestsCount;
                 ClientRequest clientRequest = new ClientRequest();
-                clientRequest.setId(rs.getInt("id"));
+                Specification specification = new Specification();
+                clientRequest.setId(rs.getInt("request.id"));
 //                clientRequest.setBirthDate(rs.getDate("birthDate"));
                 clientRequest.setFirstName(rs.getString("firstName"));
                 clientRequest.setLastName(rs.getString("lastName"));
 //                clientRequest.setIdStatus(rs.getInt("idStatus"));
 //                clientRequest.setIssueDate(rs.getDate("issueDate"));
-                clientRequest.setPeriod(rs.getInt("rentalPeriod"));
+                clientRequest.setRentalPeriod(rs.getInt("rentalPeriod"));
                 clientRequest.setRentalDate(rs.getDate("rentalDate"));
 //                clientRequest.setSerialNumber(rs.getString("serialNumber")); //for new requests
-                clientRequest.setModel(rs.getString("model"));
+                clientRequest.setReturnDate(rs.getDate("returnDate"));
+                clientRequest.setRepairCost(rs.getFloat("repairCost"));
+                specification.setModel(rs.getString("model"));
 
 
-                newRequests.add(clientRequest);
+                if (statusCode == PAYED_REQUESTS_STATUS) {
+                    clientRequest.setExpectedReturnDate(rs.getDate("expectedReturnDate"));
+                }
+
+                ComposedRequestSpecification requestSpecification = new ComposedRequestSpecification();
+                requestSpecification.setClientRequest(clientRequest);
+                requestSpecification.setSpecification(specification);
+
+                requests.add(requestSpecification);
             }
-            log.info("New requests count = " + newRequestsCount);
+            log.info("Requests count = " + requests.size());
 
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -98,7 +152,7 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
             connector.closeStatement(st);
         }
 
-        return newRequests;
+        return requests;
 
     }
 

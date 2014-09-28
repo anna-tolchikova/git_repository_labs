@@ -6,16 +6,14 @@
            version="2.5" metadata-complete="true">
 
 
-    <jsp-config>
-        <taglib>
-            <taglib-uri>/functions</taglib-uri>
-            <taglib-location>/WEB-INF/functions.tld</taglib-location>
-        </taglib>
-    </jsp-config>
-
     <context-param>
         <param-name>localeStr</param-name>
         <param-value>be_BY</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>map</param-name>
+        <param-value>/site</param-value>
     </context-param>
 
     <listener>
@@ -30,7 +28,6 @@
             <param-name>logConfigFile</param-name>
             <param-value>/xml/log4j.xml</param-value>
         </init-param>
-
 
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -47,6 +44,20 @@
     <welcome-file-list>
         <welcome-file>/WEB-INF/jsp/login.jsp</welcome-file>
     </welcome-file-list>
+
+
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/functions</taglib-uri>
+            <taglib-location>/WEB-INF/tld/functions.tld</taglib-location>
+        </taglib>
+
+        <taglib>
+            <taglib-uri>/customtags</taglib-uri>
+            <taglib-location>/WEB-INF/tld/custom.tld</taglib-location>
+        </taglib>
+
+    </jsp-config>
 
 
     <!-- error pages -->

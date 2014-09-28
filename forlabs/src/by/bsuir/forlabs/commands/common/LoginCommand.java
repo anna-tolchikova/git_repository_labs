@@ -1,14 +1,13 @@
-package by.bsuir.forlabs.commands;
+package by.bsuir.forlabs.commands.common;
 
+import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
 import by.bsuir.forlabs.logic.LoginLogic;
-import by.bsuir.forlabs.resourcesmanagers.MessageManager;
 import by.bsuir.forlabs.resourcesmanagers.RoutingManager;
 import by.bsuir.forlabs.subjects.User;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 import static by.bsuir.forlabs.utilits.ExceptionPrinter.printEx;
 
@@ -27,6 +26,8 @@ public class LoginCommand implements Command {
 
     @Override
     public String execute(HttpServletRequest request) {
+        log.info("works");
+
         String page = null;
 
         String login = request.getParameter(PARAM_NAME_LOGIN);
@@ -39,16 +40,13 @@ public class LoginCommand implements Command {
 
             if ((user =  (User)request.getSession().getAttribute("user")) == null) {
                 if ( (user = LoginLogic.checkLogin(login, pass)) == null){
-                    request.getSession().setAttribute("errorLoginPassMessage",
-                            new MessageManager((Locale) request.getSession().getAttribute("localeObj")).getProperty("message.loginerror"));
+                    request.getSession().setAttribute("errorLoginPassMessage", 1);
                     page = RoutingManager.getProperty("path.page.login");
                 }
-
             }
             if (user != null) {
                 request.getSession().setAttribute("user", user);
                 if (user.getIdRole() == ADMIN_ROLE_CODE) {
-
                     page = RoutingManager.getProperty("path.page.admin.home");
                 }
                 if (user.getIdRole() == CLIENT_ROLE_CODE) {

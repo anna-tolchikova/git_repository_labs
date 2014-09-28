@@ -6,7 +6,9 @@
         version="2.1">
 
     <display-name>Custom Functions</display-name>
-    <tlib-version>2.5</tlib-version>
+    <tlib-version>1.0</tlib-version>
+    <short-name>fc</short-name>
+    <uri>/functions</uri>
 
     <function>
         <name>concatName</name>

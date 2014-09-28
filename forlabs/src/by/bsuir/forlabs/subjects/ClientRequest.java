@@ -6,7 +6,7 @@ public class ClientRequest extends Entity{
 
     private int id;
     private Date rentalDate;
-    private int period;
+    private int rentalPeriod;
     private String serialNumber;
     private Date issueDate;
     private Date birthDate;
@@ -15,13 +15,14 @@ public class ClientRequest extends Entity{
 
 
     private Date returnDate;
+    private Date expectedReturnDate;
     private float repairCost;
     private String damageDescription;
     private int idStatus;
     private String statusComment;
     private int idCar;
 
-    private String model;
+    private int idSpecification;
 
     public ClientRequest() {
 
@@ -44,12 +45,12 @@ public class ClientRequest extends Entity{
         this.rentalDate = rentalDate;
     }
 
-    public int getPeriod() {
-        return period;
+    public int getRentalPeriod() {
+        return rentalPeriod;
     }
 
-    public void setPeriod(int period) {
-        this.period = period;
+    public void setRentalPeriod(int rentalPeriod) {
+        this.rentalPeriod = rentalPeriod;
     }
 
     public String getSerialNumber() {
@@ -100,6 +101,14 @@ public class ClientRequest extends Entity{
         this.returnDate = returnDate;
     }
 
+    public Date getExpectedReturnDate() {
+        return expectedReturnDate;
+    }
+
+    public void setExpectedReturnDate(Date expectedReturnDate) {
+        this.expectedReturnDate = expectedReturnDate;
+    }
+
     public float getRepairCost() {
         return repairCost;
     }
@@ -140,11 +149,4 @@ public class ClientRequest extends Entity{
         this.idCar = idCar;
     }
 
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
 }
