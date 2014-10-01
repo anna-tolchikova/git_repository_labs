@@ -1,7 +1,9 @@
 package by.bsuir.forlabs.commandfactory;
 
 import by.bsuir.forlabs.commands.Command;
+import by.bsuir.forlabs.commands.admin.ApproveRequestCommand;
 import by.bsuir.forlabs.commands.admin.IndexAdminApplicationCommand;
+import by.bsuir.forlabs.commands.admin.IndexAdminApplicationsCommand;
 import by.bsuir.forlabs.commands.admin.IndexAdminHomeCommand;
 import by.bsuir.forlabs.commands.client.IndexClientHomeCommand;
 import by.bsuir.forlabs.commands.common.ChangeLocaleCommand;
@@ -28,6 +30,12 @@ public enum CommandEnum {
         {
             this.command = new ChangeLocaleCommand();
         }
+    },
+    APPROVE_REQUEST {
+        {
+            this.command = new ApproveRequestCommand();
+        }
+
     },
     INDEX_ERROR403 {
         {
@@ -56,6 +64,11 @@ public enum CommandEnum {
     },INDEX_ADMIN_APPLICATION {
         {
             this.command = new IndexAdminApplicationCommand();
+        }
+    },
+    INDEX_ADMIN_APPLICATIONS {
+        {
+            this.command = new IndexAdminApplicationsCommand();
         }
     },
     INDEX_CLIENT_HOME {

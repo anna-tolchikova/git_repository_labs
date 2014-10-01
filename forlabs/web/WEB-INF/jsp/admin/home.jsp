@@ -100,7 +100,9 @@
                     <div class="sidebar-nav navbar-collapse">
                         <ul class="nav" id="side-menu">
                             <li>
-                                <a class="active" href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home'/></fmt:bundle>">
+                                <a class="active" href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.home'/>
+                                         </fmt:bundle>">
                                     <i class="fa fa-dashboard fa-fw"></i>
                                     <fmt:message key="admin.navbar.home"/>
                                 </a>
@@ -112,7 +114,11 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#"><i class="fa fa-edit fa-fw"></i> <fmt:message key="admin.navbar.requests"/></a>
+                                <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.applications'/>
+                                         </fmt:bundle>">
+                                    <i class="fa fa-edit fa-fw"></i>
+                                    <fmt:message key="admin.navbar.requests"/></a>
                             </li>
                         </ul>
                     </div>
@@ -429,8 +435,8 @@
         <!-- my scripts-- >
         <script src="${context}/js/scripts.js"></script>
 
-        <!-- jQuery Version 1.11.1 there is local version-->
-        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <!-- jQuery Version 1.11.1 version-->
+        <script src="${context}/js/jquery-1.11.1.min.js"></script>
 
         <!-- Bootstrap Core JavaScript -->
         <script src="${context}/js/bootstrap.min.js"></script>

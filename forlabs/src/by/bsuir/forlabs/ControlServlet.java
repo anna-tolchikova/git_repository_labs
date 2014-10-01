@@ -60,7 +60,7 @@ public class ControlServlet extends HttpServlet {
 
             log.info("page after execute command = " + page);
 
-            if (page != null && (!"null".equals(page))) {
+            if (page != null ) {
                 log.info("redirect to page = " + page);
                 response.sendRedirect(page);
             } else {

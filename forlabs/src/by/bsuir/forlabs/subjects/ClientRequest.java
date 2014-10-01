@@ -5,27 +5,24 @@ import java.util.Date;
 public class ClientRequest extends Entity{
 
     private int id;
+    private int idUser;
+    private int idSpecification;
     private Date rentalDate;
     private int rentalPeriod;
+    private Date returnDate;
+    private float repairCost;
     private String serialNumber;
     private Date issueDate;
     private Date birthDate;
     private String firstName;
     private String lastName;
-
-
-    private Date returnDate;
-    private Date expectedReturnDate;
-    private float repairCost;
-    private String damageDescription;
     private int idStatus;
     private String statusComment;
     private int idCar;
 
-    private int idSpecification;
+    private Date expectedReturnDate;
 
     public ClientRequest() {
-
 
     }
 
@@ -35,6 +32,23 @@ public class ClientRequest extends Entity{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+
+    public int getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
+    }
+
+    public int getIdSpecification() {
+        return idSpecification;
+    }
+
+    public void setIdSpecification(int idSpecification) {
+        this.idSpecification = idSpecification;
     }
 
     public Date getRentalDate() {
@@ -115,14 +129,6 @@ public class ClientRequest extends Entity{
 
     public void setRepairCost(float repairCost) {
         this.repairCost = repairCost;
-    }
-
-    public String getDamageDescription() {
-        return damageDescription;
-    }
-
-    public void setDamageDescription(String damageDescription) {
-        this.damageDescription = damageDescription;
     }
 
     public int getIdStatus() {

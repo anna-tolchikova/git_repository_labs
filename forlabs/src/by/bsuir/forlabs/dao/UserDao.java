@@ -56,8 +56,13 @@ public class UserDao extends AbstractDao<Integer, User> {
     }
 
     @Override
-    public void close(PreparedStatement st) {
-        super.close(st);
+    public PreparedStatement prepareStatement(String st) throws SQLException {
+        return super.prepareStatement(st);
+    }
+
+    @Override
+    public void closeStatement(PreparedStatement st) {
+        super.closeStatement(st);
     }
 
     public User findByLoginPassword (String login, String password) throws DaoException {
@@ -65,7 +70,7 @@ public class UserDao extends AbstractDao<Integer, User> {
 
         PreparedStatement st = null;
         try {
-            st = connector.prepareStatement(SQL_SELECT_BY_LOGIN_PASSWORD);
+            st = prepareStatement(SQL_SELECT_BY_LOGIN_PASSWORD);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -101,7 +106,7 @@ public class UserDao extends AbstractDao<Integer, User> {
         } catch (SQLException | NoSuchAlgorithmException e) {
             throw new DaoException(e);
         } finally {
-            connector.closeStatement(st);
+            closeStatement(st);
         }
         return user;
     }

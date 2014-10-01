@@ -1,6 +1,7 @@
 package by.bsuir.forlabs.connectionpool;
 
 import by.bsuir.forlabs.exceptions.ConnectionInitException;
+import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.resourcesmanagers.DatabaseManager;
 import org.apache.log4j.Logger;
 
@@ -18,11 +19,16 @@ public class ConnectionPool {
 
     private static Logger log = Logger.getLogger(ConnectionPool.class);
 
-    private final static int MAX_POOL_SIZE = 10;
-    private final static int MAX_CLIENT_WAIT_PERIOD_MSEC = 15000;
-    private final static int MAX_IDLE_TIMEOUT_MSEC = 3600000;           // 1hour
-    private final static int FIRST_DELAY_PERIOD_MSEC = 3600000;         // 1hour
-    private final static int REPEAT_TASK_DELAY_PERIOD_MSEC = 36000000;  // 1hour
+    private final static int MAX_POOL_SIZE =
+            Integer.parseInt(ConfigurationManager.getProperty("pool.max.size"));
+    private final static int MAX_CLIENT_WAIT_PERIOD_MSEC =
+            Integer.parseInt(ConfigurationManager.getProperty("pool.max.clientwaitperiod.msec"));
+    private final static int MAX_IDLE_TIMEOUT_MSEC =
+            Integer.parseInt(ConfigurationManager.getProperty("pool.max.idletimeout.msec"));           // 3hours
+    private final static int FIRST_DELAY_PERIOD_MSEC =
+            Integer.parseInt(ConfigurationManager.getProperty("pool.firstdelayperiod.msec"));         // 3hours
+    private final static int REPEAT_TASK_DELAY_PERIOD_MSEC =
+            Integer.parseInt(ConfigurationManager.getProperty("pool.repeattaskperiod.msec"));  // 3hours
 
     private final Lock      lock = new ReentrantLock();
     private final Condition notEmpty = lock.newCondition();
