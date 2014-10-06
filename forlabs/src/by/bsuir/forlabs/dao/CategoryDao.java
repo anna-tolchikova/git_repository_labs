@@ -2,7 +2,7 @@ package by.bsuir.forlabs.dao;
 
 import by.bsuir.forlabs.connectionpool.WrapperConnector;
 import by.bsuir.forlabs.exceptions.DaoException;
-import by.bsuir.forlabs.subjects.Status;
+import by.bsuir.forlabs.subjects.Category;
 import org.apache.log4j.Logger;
 
 import java.sql.PreparedStatement;
@@ -10,34 +10,37 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class StatusDao extends AbstractDao<Integer, Status> {
+public class CategoryDao extends AbstractDao<Integer, Category> {
 
-    private static Logger log = Logger.getLogger(StatusDao.class);
+    private static Logger log = Logger.getLogger(CategoryDao.class);
 
 
     private final static String SQL_SELECT_ALL = "";
-    private final static String SQL_SELECT_BY_ID = "select * from requestStatus where id = ?";
+    private final static String SQL_SELECT_BY_ID =
+            "select * " +
+                    "from category " +
+                    "where id = ?";
 
-    public StatusDao(WrapperConnector connector) {
+    public CategoryDao(WrapperConnector connector) {
         super(connector);
     }
 
     @Override
-    public List<Status> findAll() {
+    public List<Category> findAll() {
         return null;
     }
 
-
-    private void fillObject (Status status, ResultSet rs) throws SQLException {
-        status.setId(rs.getInt("id"));
-        status.setName(rs.getString("name"));
-        status.setDescription(rs.getString("description"));
-    }
+    /**
+     *
+     * @param id
+     * @return Category object, null if not found
+     * @throws DaoException
+     */
 
     @Override
-    public Status findEntityById(Integer id) throws DaoException {
+    public Category findEntityById(Integer id) throws DaoException {
 
-        Status status = null;
+        Category category = null;
         PreparedStatement st = null;
         try {
             st = connector.prepareStatement(SQL_SELECT_BY_ID);
@@ -48,9 +51,8 @@ public class StatusDao extends AbstractDao<Integer, Status> {
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
             if (rs.next()){
-                status = new Status();
-                fillObject(status, rs);
-
+                category = new Category();
+                fillObject(category, rs);
             }
             rs.close();
         } catch (SQLException e) {
@@ -59,7 +61,7 @@ public class StatusDao extends AbstractDao<Integer, Status> {
             connector.closeStatement(st);
         }
 
-        return status;
+        return category;
     }
 
     @Override
@@ -68,14 +70,21 @@ public class StatusDao extends AbstractDao<Integer, Status> {
     }
 
     @Override
-    public boolean create(Status entity) {
+    public boolean create(Category entity) {
         return false;
     }
 
     @Override
-    public void update(Status entity) {
+    public void update(Category entity) {
 
     }
+
+
+    private void fillObject (Category category, ResultSet rs) throws SQLException {
+        category.setId(rs.getInt("id"));
+        category.setName(rs.getString("name"));
+    }
+
 
 
 }

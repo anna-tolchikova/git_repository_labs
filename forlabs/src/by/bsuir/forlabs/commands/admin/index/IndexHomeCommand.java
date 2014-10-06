@@ -1,8 +1,8 @@
-package by.bsuir.forlabs.commands.admin;
+package by.bsuir.forlabs.commands.admin.index;
 
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
-import by.bsuir.forlabs.logic.ClientRequestsLogic;
+import by.bsuir.forlabs.logic.admin.ClientRequestsLogic;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.subjects.composers.Composed;
 import org.apache.log4j.Logger;
@@ -10,11 +10,11 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
-import static by.bsuir.forlabs.utilits.ExceptionPrinter.printEx;
+import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
-public class IndexAdminHomeCommand implements Command {
+public class IndexHomeCommand implements Command {
 
-    private final static Logger log = Logger.getLogger(IndexAdminHomeCommand.class);
+    private final static Logger log = Logger.getLogger(IndexHomeCommand.class);
 
     @Override
     public String execute(HttpServletRequest request) {
@@ -36,7 +36,7 @@ public class IndexAdminHomeCommand implements Command {
             page = ConfigurationManager.getProperty("path.page.admin.home");
 
         } catch (LogicalException e) {
-            printEx(e);
+            printException(e);
         }
 
 

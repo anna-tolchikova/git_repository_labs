@@ -108,10 +108,45 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
-                                    <i class="fa fa-table fa-fw"></i>
+                                <a class="active" href="#">
+                                    <i class="fa fa-sitemap fa-fw"></i>
                                     <fmt:message key="admin.navbar.cars"/>
+                                    <span class="fa arrow"></span>
                                 </a>
+
+                                <ul class="nav nav-second-level collapse in" style="">
+                                    <li>
+                                        <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=1">
+                                            <fmt:message key="admin.navbar.cars.econom"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=2">
+                                            <fmt:message key="admin.navbar.cars.middle"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=3">
+                                            <fmt:message key="admin.navbar.cars.business"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=4">
+                                            <fmt:message key="admin.navbar.cars.jeaps"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<fmt:bundle basename='resources.routing'>
+                                         <fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=5">
+                                            <fmt:message key="admin.navbar.cars.kupe"/>
+                                        </a>
+                                    </li>
+                                </ul>
+
                             </li>
                             <li>
                                 <a href="<fmt:bundle basename='resources.routing'>
@@ -247,6 +282,7 @@
                                         <thead>
                                         <tr>
                                             <th></th>
+                                            <th><fmt:message key="admin.home.tables.th.requestDate"/></th>
                                             <th><fmt:message key="admin.home.tables.th.name"/></th>
                                             <th><fmt:message key="admin.home.tables.th.model"/></th>
                                             <th><fmt:message key="admin.home.tables.th.rentalDate"/></th>
@@ -258,6 +294,7 @@
                                         <c:forEach var="requestCl" items="${newRequests}">
                                             <tr>
                                                 <td></td>
+                                                <td><fmt:formatDate value='${requestCl.clientRequest.requestDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
                                                 <td><c:out value="${fc:concatName(requestCl.clientRequest.firstName, requestCl.clientRequest.lastName)}"/></td>
                                                 <td><c:out value="${requestCl.specification.model}"/></td>
                                                 <td><fmt:formatDate value='${requestCl.clientRequest.rentalDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
@@ -293,6 +330,7 @@
                                         <thead>
                                         <tr>
                                             <th></th>
+                                            <th><fmt:message key="admin.home.tables.th.requestDate"/></th>
                                             <th><fmt:message key="admin.home.tables.th.name"/></th>
                                             <th><fmt:message key="admin.home.tables.th.model"/></th>
                                             <th><fmt:message key="admin.home.tables.th.rentalDate"/></th>
@@ -304,6 +342,7 @@
                                         <c:forEach var="requestCl" items="${expiredRequests}">
                                             <tr>
                                                 <td></td>
+                                                <td><fmt:formatDate value='${requestCl.clientRequest.requestDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
                                                 <td><c:out value="${fc:concatName(requestCl.clientRequest.firstName, requestCl.clientRequest.lastName)}"/></td>
                                                 <td><c:out value="${requestCl.specification.model}"/></td>
                                                 <td><fmt:formatDate value='${requestCl.clientRequest.rentalDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
@@ -461,7 +500,7 @@
                         "orderable": false,
                         "targets": [0,5]
                     } ],
-                    "order": [[ 3, 'asc' ]]
+                    "order": [[ 1, 'asc' ]]
                 } );
 
                 t.on( 'order.dt search.dt', function () {
@@ -481,7 +520,7 @@
                         "orderable": false,
                         "targets": [0,5]
                     } ],
-                    "order": [[ 3, 'asc' ]]
+                    "order": [[ 1, 'asc' ]]
                 } );
 
                 t.on( 'order.dt search.dt', function () {

@@ -16,24 +16,46 @@ public class CarDao extends AbstractDao<Integer, Car> {
 
     private static Logger log = Logger.getLogger(CarDao.class);
 
+    private final static int NEW_REQUESTS_STATUS = 1;
 
     private final static String SQL_SELECT_ALL = "";
-    private final static String SQL_SELECT_FREE_CARS_ON_DATE = "SELECT DISTINCT car.id FROM car " +
-            "LEFT JOIN request " +
-            "ON  car.id = request.idCar " +
-            "WHERE car.idSpecification = ? " +
-            "AND ((DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY) < ? " +
-            "AND returnDate = null) " +
-            "OR isFree = 1)";
+    private final static String SQL_SELECT_FREE_CARS_ON_DATE_BY_SPEC = 
+            "SELECT * FROM car " +
+                    "WHERE (isFree=1 " +
+                    "AND idSpecification = ?) " +
+                    "OR " +
+                    "id IN ( " +
+                    "    SELECT idCar FROM request " +
+                    "    WHERE idSpecification = ?  " +
+                    "    AND returnDate IS NULL " +
+                    "    AND (DATEDIFF(?, rentalDate) > rentalPeriod  " +
+                    "         OR " +
+                    "         DATEDIFF(rentalDate, ?) >= ? " +
+                    "        )" +
+                    "    AND idStatus<>" + NEW_REQUESTS_STATUS +
+                    ")";
 
-    private final static String SQL_SELECT_COUNT_FREE_CARS_ON_DATE = "SELECT COUNT(DISTINCT car.id) " +
-            "FROM car " +
-            "LEFT JOIN request " +
-            "ON  car.id = request.idCar " +
-            "WHERE car.idSpecification = ? " +
-            "AND ((DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY) < ? " +
-            "AND returnDate = null) " +
-            "OR isFree = 1)";
+    private final static String SQL_SELECT_COUNT_FREE_CARS_ON_DATE_BY_SPEC =
+            "SELECT COUNT(*) FROM car " +
+                    "WHERE (isFree=1 " +
+                    "AND idSpecification = ?) " +
+                    "OR " +
+                    "id IN ( " +
+                    "    SELECT idCar FROM request " +
+                    "    WHERE idSpecification = ?  " +
+                    "    AND returnDate IS NULL " +
+                    "    AND (DATEDIFF(?, rentalDate) > rentalPeriod  " +
+                    "         OR " +
+                    "         DATEDIFF(rentalDate, ?) >= ? " +
+                    "        )" +
+                    "    AND idStatus<>" + NEW_REQUESTS_STATUS +
+                    ")";
+
+    private final static String SQL_UPDATE =
+            "UPDATE car " +
+                    "SET isFree = ? " +
+                    "WHERE id = ?";
+
     public CarDao(WrapperConnector connector) {
         super(connector);
     }
@@ -54,29 +76,29 @@ public class CarDao extends AbstractDao<Integer, Car> {
     }
 
     @Override
-    public boolean delete(Car entity) {
-        return false;
-    }
-
-    @Override
     public boolean create(Car entity) {
         return false;
     }
 
     @Override
-    public Car update(Car entity) {
-        return null;
+    public void update(Car entity) throws DaoException {
+        PreparedStatement st = null;
+        try {
+            st = connector.prepareStatement(SQL_UPDATE);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+
+        try {
+            st.setBoolean(1, entity.isFree());
+            st.setInt(2, entity.getId());
+            log.info("update Car. Affected rows count = " + st.executeUpdate());
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
     }
 
-    @Override
-    public PreparedStatement prepareStatement(String st) throws SQLException {
-        return super.prepareStatement(st);
-    }
-
-    @Override
-    public void closeStatement(PreparedStatement st) {
-        super.closeStatement(st);
-    }
 
     private void fillObject (Car car, ResultSet rs) throws SQLException {
         car.setId(rs.getInt("id"));
@@ -85,55 +107,67 @@ public class CarDao extends AbstractDao<Integer, Car> {
         car.setIdSpecification(rs.getInt("idSpecification"));
     }
 
-    public ArrayList<Car> findFreeCarsBySpecificationsOnDate(int idSpecification, Date rentalDate) throws DaoException {
+    public ArrayList<Car> findFreeCarsBySpecificationsOnDate(int idSpecification, Date rentalDate, int rentalPeriod )
+            throws DaoException {
 
         ArrayList<Car> cars = new ArrayList<Car>();
         PreparedStatement st = null;
         try {
-            st = prepareStatement(SQL_SELECT_FREE_CARS_ON_DATE);
+            st = connector.prepareStatement(SQL_SELECT_FREE_CARS_ON_DATE_BY_SPEC);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
 
         try {
             st.setInt(1, idSpecification);
-            st.setDate(2, (java.sql.Date) rentalDate);
+            st.setInt(2, idSpecification);
+            st.setDate(3, (java.sql.Date) rentalDate);
+            st.setDate(4, (java.sql.Date) rentalDate);
+            st.setInt(5, rentalPeriod);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Car car = new Car();
                 fillObject(car, rs);
                 cars.add(car);
             }
+            rs.close();
 
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return cars;
     }
 
-    public int countFreeCarsBySpecificationsOnDate(int idSpecification, Date rentalDate) throws DaoException {
+    public int countFreeCarsBySpecificationsOnDate(int idSpecification, Date rentalDate, int rentalPeriod)
+            throws DaoException {
 
-        int freeCarsCount;
+        int freeCarsCount = 0;
         PreparedStatement st = null;
         try {
-            st = prepareStatement(SQL_SELECT_FREE_CARS_ON_DATE);
+            st = connector.prepareStatement(SQL_SELECT_COUNT_FREE_CARS_ON_DATE_BY_SPEC);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
 
         try {
+
             st.setInt(1, idSpecification);
-            st.setDate(2, (java.sql.Date) rentalDate);
+            st.setInt(2, idSpecification);
+            st.setDate(3, (java.sql.Date) rentalDate);
+            st.setDate(4, (java.sql.Date) rentalDate);
+            st.setInt(5, rentalPeriod);
             ResultSet rs = st.executeQuery();
-            rs.next();
-            freeCarsCount = rs.getInt(1);
+            if(rs.next()) {
+                freeCarsCount = rs.getInt(1);
+            }
+            rs.close();
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return freeCarsCount;

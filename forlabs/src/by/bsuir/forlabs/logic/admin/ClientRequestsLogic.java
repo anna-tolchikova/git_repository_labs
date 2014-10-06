@@ -1,4 +1,4 @@
-package by.bsuir.forlabs.logic;
+package by.bsuir.forlabs.logic.admin;
 
 import by.bsuir.forlabs.connectionpool.ConnectionPool;
 import by.bsuir.forlabs.connectionpool.WrapperConnector;
@@ -18,18 +18,20 @@ import java.util.ArrayList;
 public class ClientRequestsLogic {
 
     private final static int NEW_REQUESTS_STATUS = 1;
-    private final static int ACCEPTED_REQUESTS_STATUS = 2;
-    private final static int PAYED_REQUESTS_STATUS = 4;
     private final static int DAMAGED_REQUESTS_STATUS = 6;
 
+    /**
+     * @return
+     * @throws LogicalException
+     */
     public static ArrayList<Composed> findNewRequests() throws LogicalException {
 
-        ArrayList<Composed> newRequests = null;
+        ArrayList<Composed> newRequests = new ArrayList<>();
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
-        ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
+            ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
             newRequests = clientRequestDao.findJoinedWithSpecificationByStatus(NEW_REQUESTS_STATUS);
 
         } catch (DaoException e) {
@@ -41,33 +43,39 @@ public class ClientRequestsLogic {
         return newRequests;
     }
 
+    /**
+     * @return
+     * @throws LogicalException
+     */
     public static ArrayList<Composed> findExpiredRequests() throws LogicalException {
-        ArrayList<Composed> carsForRepair = null;
+        ArrayList<Composed> carsForRepair = new ArrayList<>();
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
-        ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
-            carsForRepair = clientRequestDao.findJoinedWithSpecificationByStatus(ACCEPTED_REQUESTS_STATUS);
-
+            ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
+            carsForRepair = clientRequestDao.findJoinedWithSpecificationExpiredRequests();
         } catch (DaoException e) {
             throw new LogicalException(e);
         } finally {
             pool.releaseConnection(wc);
         }
 
-
         return carsForRepair;
     }
 
+    /**
+     * @return
+     * @throws LogicalException
+     */
     public static ArrayList<Composed> findNotReturnedRequests() throws LogicalException {
-        ArrayList<Composed> carsForRepair = null;
+        ArrayList<Composed> carsForRepair = new ArrayList<>();
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
         ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
-            carsForRepair = clientRequestDao.findJoinedWithSpecificationByStatus(PAYED_REQUESTS_STATUS);
+            carsForRepair = clientRequestDao.findJoinedWithSpecificationNotReturnedRequests();
 
         } catch (DaoException e) {
             throw new LogicalException(e);
@@ -79,13 +87,17 @@ public class ClientRequestsLogic {
         return carsForRepair;
     }
 
+    /**
+     * @return
+     * @throws LogicalException
+     */
     public static ArrayList<Composed> findDamagedRequests() throws LogicalException {
-        ArrayList<Composed> carsForRepair = null;
+        ArrayList<Composed> carsForRepair = new ArrayList<>();
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
-        ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
 
         try {
+            ClientRequestDao clientRequestDao = new ClientRequestDao(wc);
             carsForRepair = clientRequestDao.findJoinedWithSpecificationByStatus(DAMAGED_REQUESTS_STATUS);
 
         } catch (DaoException e) {
@@ -98,8 +110,13 @@ public class ClientRequestsLogic {
         return carsForRepair;
     }
 
+    /**
+     * @param id
+     * @return ComposedRequestSpecificationStatus object - full info for dispaying
+     * @throws LogicalException if request not found
+     */
     public static ComposedRequestSpecificationStatus composeFullInfoById(int id) throws LogicalException {
-        ComposedRequestSpecificationStatus composedInfo = new ComposedRequestSpecificationStatus();
+        ComposedRequestSpecificationStatus composedInfo = null;
 
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
@@ -111,12 +128,17 @@ public class ClientRequestsLogic {
             SpecificationDao specificationDao = new SpecificationDao(wc);
 
             ClientRequest clientRequest = clientRequestDao.findEntityById(id);
-            Status status = statusDao.findEntityById(clientRequest.getIdStatus());
-            Specification specification = specificationDao.findEntityById(clientRequest.getIdSpecification());
+            if (clientRequest != null) {
+                composedInfo = new ComposedRequestSpecificationStatus();
+                Status status = statusDao.findEntityById(clientRequest.getIdStatus());
+                Specification specification = specificationDao.findEntityById(clientRequest.getIdSpecification());
 
-            composedInfo.setClientRequest(clientRequest);
-            composedInfo.setStatus(status);
-            composedInfo.setSpecification(specification);
+                composedInfo.setClientRequest(clientRequest);
+                composedInfo.setStatus(status);
+                composedInfo.setSpecification(specification);
+            } else {
+                throw new LogicalException("Request with id = " + id + " doesn't exist");
+            }
         } catch (DaoException e) {
             throw new LogicalException(e);
         } finally {
@@ -126,10 +148,13 @@ public class ClientRequestsLogic {
         return composedInfo;
     }
 
+    /**
+     * @return
+     * @throws LogicalException
+     */
     public static ArrayList<ComposedRequestSpecificationStatus> composeFullInfo() throws LogicalException {
-        ArrayList<ClientRequest> allRequests = new ArrayList<ClientRequest>();
-        ArrayList<ComposedRequestSpecificationStatus> composedInfoArray =
-                new ArrayList<ComposedRequestSpecificationStatus>();
+        ArrayList<ClientRequest> allRequests;
+        ArrayList<ComposedRequestSpecificationStatus> composedInfoArray = new ArrayList<>();
         ConnectionPool pool = ConnectionPool.getInstance();
         WrapperConnector wc = pool.getConnection();
 
@@ -138,7 +163,7 @@ public class ClientRequestsLogic {
             allRequests = clientRequestDao.findAll();
             StatusDao statusDao = new StatusDao(wc);
             SpecificationDao specificationDao = new SpecificationDao(wc);
-            for (ClientRequest clientRequest: allRequests) {
+            for (ClientRequest clientRequest : allRequests) {
                 Status status = statusDao.findEntityById(clientRequest.getIdStatus());
                 Specification specification = specificationDao.findEntityById(clientRequest.getIdSpecification());
                 ComposedRequestSpecificationStatus composedInfo = new ComposedRequestSpecificationStatus();

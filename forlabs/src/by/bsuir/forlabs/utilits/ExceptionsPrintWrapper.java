@@ -2,11 +2,11 @@ package by.bsuir.forlabs.utilits;
 
 import org.apache.log4j.Logger;
 
-public class ExceptionPrinter {
+public class ExceptionsPrintWrapper {
 
-    private static final Logger log = Logger.getLogger(ExceptionPrinter.class);
+    private static final Logger log = Logger.getLogger(ExceptionsPrintWrapper.class);
 
-    public static void printEx(Throwable ex){
+    public static void printException(Throwable ex){
         Throwable tmp = ex;
 
         if (tmp.getCause() != null) {

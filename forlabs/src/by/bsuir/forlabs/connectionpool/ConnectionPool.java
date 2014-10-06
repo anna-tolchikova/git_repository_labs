@@ -194,6 +194,7 @@ public class ConnectionPool {
         try {
             connections.add(wc);
             connectionsLastUsingMap.put(wc, new Date().getTime());
+            log.info("Connection was released");
             notEmpty.signal();
         } finally {
             lock.unlock();

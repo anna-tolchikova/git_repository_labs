@@ -25,7 +25,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title><fmt:message key='admin.apps.title' /></title>
+        <title><fmt:message key='admin.cars.title' /></title>
 
         <!-- Bootstrap Core CSS -->
         <link href="${context}/css/bootstrap.min.css" rel="stylesheet">
@@ -63,12 +63,6 @@
             <!-- Navigation -->
             <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
                     <a class="navbar-brand" href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home' /></fmt:bundle>">
                         <strong>
                             <fmt:message key="admin.servicetitile"/>
@@ -149,7 +143,7 @@
 
                             </li>
                             <li>
-                                <a class="active" href="<fmt:bundle basename='resources.routing'>
+                                <a href="<fmt:bundle basename='resources.routing'>
                                          <fmt:message key='path.page.admin.applications'/>
                                          </fmt:bundle>">
                                     <i class="fa fa-edit fa-fw"></i>
@@ -165,7 +159,10 @@
             <div id="page-wrapper">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header"><fmt:message key="admin.apps.h1.pageheader"/></h1>
+                        <h1 class="page-header">
+                            <c:out value=" ${category.name}"/>
+                        </h1>
+
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
@@ -178,46 +175,45 @@
                 <div class="row">
                     <div class="col-lg-12">
 
-                        <div class="panel panel-primary" id="allRequestsPanel">
+                        <div class="panel panel-success" id="allCarsPanel">
                             <div class="panel-heading">
-                                <jsp:useBean id="now" class="java.util.Date" />
-                                <b><fmt:message key="admin.apps.table.title"/></b>
-                                <i><fmt:formatDate value="${now}" type="both" pattern="dd.MM.y, kk:mm:ss"/></i>
+
+                                    <a href="<fmt:bundle basename="resources.routing"><fmt:message key='path.page.admin.category.specifications.add'/></fmt:bundle>?id=${category.id}">
+                                        <button class="btn btn-primary" type="button">
+                                            <fmt:message key="admin.specifications.h1.pageheader.addbutton"/>
+                                        </button>
+                                    </a>
                             </div>
                             <!-- /.panel-heading -->
                             <div class="panel-body">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-bordered table-hover" id="allRequestsTable">
+                                    <table class="table table-striped table-bordered table-hover" id="allCarsTable">
                                         <thead>
                                         <tr>
                                             <th></th>
-                                            <th><fmt:message key="admin.apps.table.th.status"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.requestDate"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.name"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.model"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.rentalDate"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.rentalPeriod"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.returndate"/></th>
-                                            <th><fmt:message key="admin.apps.table.th.repaircost"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.model"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.producer"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.year"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.totalCount"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.freeCount"/></th>
+                                            <th><fmt:message key="admin.specifications.table.th.image"/></th>
                                             <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <c:forEach var="requestCl" items="${composedInfo}">
+                                        <c:forEach var="specifications" items="${specificationsInCategory}">
                                             <tr>
                                                 <td></td>
-                                                <td><c:out value="${requestCl.status.name}"/></td>
-                                                <td><fmt:formatDate value='${requestCl.clientRequest.requestDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
-                                                <td><c:out value="${fc:concatName(requestCl.clientRequest.firstName, requestCl.clientRequest.lastName)}"/></td>
-                                                <td><c:out value="${requestCl.specification.model}"/></td>
-                                                <td><fmt:formatDate value='${requestCl.clientRequest.rentalDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
-                                                <td  class="center"><c:out value="${requestCl.clientRequest.rentalPeriod}"/></td>
-                                                <td><fmt:formatDate value='${requestCl.clientRequest.returnDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
-                                                <td><c:out value='${requestCl.clientRequest.repairCost}'/></td>
+                                                <td><c:out value="${specifications.model}"/></td>
+                                                <td><c:out value="${specifications.producer}"/></td>
+                                                <td><c:out value="${specifications.year}"/></td>
+                                                <td><c:out value='${specifications.totalCount}'/></td>
+                                                <td><c:out value='${specifications.freeCount}'/></td>
+                                                <td><img src="${pageContext.servletContext.getRealPath(specifications.image)}"/></td>
                                                 <td  class="center">
                                                     <a style="display: inline-block; height:100%;width:100%; text-align:center;"
-                                                       href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.application'/></fmt:bundle>?id=${requestCl.clientRequest.id}">
-                                                        <input class="btn btn-outline btn-primary btn-xs" type="button" value="<fmt:message key='admin.apps.table.show'/>" />
+                                                       href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.specifications.cars'/></fmt:bundle>?id=${specifications.id}">
+                                                        <input class="btn btn-outline btn-primary btn-xs" type="button" value="<fmt:message key='admin.specifications.table.showbutton'/>" />
                                                     </a>
                                                 </td>
                                             </tr>
@@ -266,11 +262,11 @@
         <!-- for new requests -->
         <script>
             $(document).ready(function() {
-                var t = $('#allRequestsTable').DataTable( {
+                var t = $('#allCarsTable').DataTable( {
                     "columnDefs": [ {
                         "searchable": false,
                         "orderable": false,
-                        "targets": [0,8]
+                        "targets": [0,7]
                     } ],
                     "order": [[ 2, 'asc' ]]
                 } );

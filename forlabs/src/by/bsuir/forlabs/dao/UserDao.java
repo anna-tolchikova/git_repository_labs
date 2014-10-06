@@ -41,28 +41,13 @@ public class UserDao extends AbstractDao<Integer, User> {
     }
 
     @Override
-    public boolean delete(User entity) {
-        return false;
-    }
-
-    @Override
     public boolean create(User entity) {
         return false;
     }
 
     @Override
-    public User update(User entity) {
-        return null;
-    }
+    public void update(User entity) {
 
-    @Override
-    public PreparedStatement prepareStatement(String st) throws SQLException {
-        return super.prepareStatement(st);
-    }
-
-    @Override
-    public void closeStatement(PreparedStatement st) {
-        super.closeStatement(st);
     }
 
     public User findByLoginPassword (String login, String password) throws DaoException {
@@ -70,7 +55,7 @@ public class UserDao extends AbstractDao<Integer, User> {
 
         PreparedStatement st = null;
         try {
-            st = prepareStatement(SQL_SELECT_BY_LOGIN_PASSWORD);
+            st = connector.prepareStatement(SQL_SELECT_BY_LOGIN_PASSWORD);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -103,10 +88,11 @@ public class UserDao extends AbstractDao<Integer, User> {
                 user.setPassword(passwordMd5);
                 user.setIdRole(rs.getInt("idRole"));
             }
+            rs.close();
         } catch (SQLException | NoSuchAlgorithmException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
         return user;
     }

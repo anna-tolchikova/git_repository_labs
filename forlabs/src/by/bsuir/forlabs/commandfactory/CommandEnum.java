@@ -1,10 +1,11 @@
 package by.bsuir.forlabs.commandfactory;
 
 import by.bsuir.forlabs.commands.Command;
-import by.bsuir.forlabs.commands.admin.ApproveRequestCommand;
-import by.bsuir.forlabs.commands.admin.IndexAdminApplicationCommand;
-import by.bsuir.forlabs.commands.admin.IndexAdminApplicationsCommand;
-import by.bsuir.forlabs.commands.admin.IndexAdminHomeCommand;
+import by.bsuir.forlabs.commands.admin.*;
+import by.bsuir.forlabs.commands.admin.index.IndexApplicationCommand;
+import by.bsuir.forlabs.commands.admin.index.IndexApplicationsCommand;
+import by.bsuir.forlabs.commands.admin.index.IndexCategorySpecificationsCommand;
+import by.bsuir.forlabs.commands.admin.index.IndexHomeCommand;
 import by.bsuir.forlabs.commands.client.IndexClientHomeCommand;
 import by.bsuir.forlabs.commands.common.ChangeLocaleCommand;
 import by.bsuir.forlabs.commands.common.IndexLoginCommand;
@@ -37,6 +38,24 @@ public enum CommandEnum {
         }
 
     },
+    REJECT_REQUEST {
+        {
+            this.command = new RejectRequestCommand();
+        }
+
+    },
+    RETURN_CAR {
+        {
+            this.command = new ReturnCarCommand();
+        }
+
+    },
+    SET_REPAIR_BILL {
+        {
+            this.command = new SetRepairBillCommand();
+        }
+
+    },
     INDEX_ERROR403 {
         {
             this.command = new IndexError403Command();
@@ -59,16 +78,32 @@ public enum CommandEnum {
     },
     INDEX_ADMIN_HOME {
         {
-            this.command = new IndexAdminHomeCommand();
+            this.command = new IndexHomeCommand();
         }
-    },INDEX_ADMIN_APPLICATION {
+    },
+    INDEX_ADMIN_APPLICATION {
         {
-            this.command = new IndexAdminApplicationCommand();
+            this.command = new IndexApplicationCommand();
         }
     },
     INDEX_ADMIN_APPLICATIONS {
         {
-            this.command = new IndexAdminApplicationsCommand();
+            this.command = new IndexApplicationsCommand();
+        }
+    },
+    INDEX_ADMIN_CATEGORY_SPECIFICATIONS {
+        {
+            this.command = new IndexCategorySpecificationsCommand();
+        }
+    },
+    INDEX_ADMIN_CATEGORY_SPECIFICATIONS_ADD {
+        {
+            this.command = new IndexCategorySpecificationsCommand();
+        }
+    },
+    INDEX_ADMIN_SPECIFICATIONS_CARS {
+        {
+            this.command = new IndexCategorySpecificationsCommand();
         }
     },
     INDEX_CLIENT_HOME {

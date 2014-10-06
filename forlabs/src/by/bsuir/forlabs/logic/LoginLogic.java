@@ -10,6 +10,13 @@ import by.bsuir.forlabs.subjects.User;
 
 public class LoginLogic {
 
+    /**
+     *
+     * @param enterLogin
+     * @param enterPass
+     * @return
+     * @throws LogicalException
+     */
     public static User checkLogin(String enterLogin, String enterPass) throws LogicalException {
 
         ConnectionPool pool = ConnectionPool.getInstance();

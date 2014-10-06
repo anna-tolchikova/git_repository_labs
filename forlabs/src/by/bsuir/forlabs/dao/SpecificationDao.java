@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpecificationDao extends AbstractDao<Integer, Specification> {
@@ -16,7 +17,21 @@ public class SpecificationDao extends AbstractDao<Integer, Specification> {
 
 
     private final static String SQL_SELECT_ALL = "";
-    private final static String SQL_SELECT_BY_ID = "select * from specifications where id = ?";
+    private final static String SQL_SELECT_BY_ID =
+            "SELECT * " +
+                    "FROM specifications " +
+                    "WHERE id = ?";
+    private final static String SQL_SELECT_BY_ID_CATEGORY =
+            "SELECT * " +
+                    "FROM specifications " +
+                    "WHERE idCategory = ?";
+    private final static String SQL_SELECT_BY_ID_CATEGORY_WITH_COMPUDET_COLUMNS =
+            "SELECT *, COUNT(*) as 'totalCount', SUM(car.isFree) as 'freeCount' " +
+                    "FROM specifications " +
+                    "INNER JOIN car " +
+                    "WHERE specifications.id = car.idSpecification " +
+                    "AND idCategory= ? " +
+                    "GROUP BY specifications.id";
 
     public SpecificationDao(WrapperConnector connector) {
         super(connector);
@@ -25,6 +40,48 @@ public class SpecificationDao extends AbstractDao<Integer, Specification> {
     @Override
     public List<Specification> findAll() {
         return null;
+    }
+
+    @Override
+    public Specification findEntityById(Integer id) throws DaoException {
+
+        Specification specification = null;
+        PreparedStatement st = null;
+        try {
+            st = connector.prepareStatement(SQL_SELECT_BY_ID);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        try {
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()){
+                specification = new Specification();
+                fillObject(specification, rs);
+            }
+            rs.close();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
+
+        return specification;
+    }
+
+    @Override
+    public boolean delete(Integer id) {
+        return false;
+    }
+
+    @Override
+    public boolean create(Specification entity) {
+        return false;
+    }
+
+    @Override
+    public void update(Specification entity) {
+
     }
 
     private void fillObject(Specification specification, ResultSet rs) throws SQLException {
@@ -39,60 +96,76 @@ public class SpecificationDao extends AbstractDao<Integer, Specification> {
         specification.setImage(rs.getString("image"));
     }
 
-    @Override
-    public Specification findEntityById(Integer id) throws DaoException {
+    private void fillComputedColumns(Specification specification, ResultSet rs) throws SQLException {
+        specification.setTotalCount(rs.getInt("totalCount"));
+        specification.setFreeCount(rs.getInt("freeCount"));
+    }
 
-        Specification specification = null;
+    /**
+     *
+     * @param idCategory
+     * @return ArrayList<Specification> - set of specifications in category, empty set if nothing was found
+     * @throws DaoException
+     */
+    public ArrayList<Specification> findByCategory(int idCategory) throws DaoException {
+
+        ArrayList<Specification> specifications = new ArrayList<Specification>();
         PreparedStatement st = null;
         try {
-            st = prepareStatement(SQL_SELECT_BY_ID);
+            st = connector.prepareStatement(SQL_SELECT_BY_ID_CATEGORY);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
         try {
-            st.setInt(1, id);
+            st.setInt(1, idCategory);
             ResultSet rs = st.executeQuery();
-            if (rs.next()){
-                specification = new Specification();
+            while (rs.next()){
+                Specification specification = new Specification();
                 fillObject(specification, rs);
+                specifications.add(specification);
             }
+            rs.close();
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
-        return specification;
+        return specifications;
     }
 
-    @Override
-    public boolean delete(Integer id) {
-        return false;
-    }
+    /**
+     *
+     * @param idCategory
+     * @return ArrayList<Specification> - set of specifications in category, empty set if nothing was found
+     * @throws DaoException
+     */
+    public ArrayList<Specification> findByCategoryWithComputedColumns(int idCategory) throws DaoException {
 
-    @Override
-    public boolean delete(Specification entity) {
-        return false;
-    }
+        ArrayList<Specification> specifications = new ArrayList<>();
+        PreparedStatement st;
+        try {
+            st = connector.prepareStatement(SQL_SELECT_BY_ID_CATEGORY_WITH_COMPUDET_COLUMNS);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        try {
+            st.setInt(1, idCategory);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()){
+                Specification specification = new Specification();
+                fillObject(specification, rs);
+                fillComputedColumns(specification, rs);
+                specifications.add(specification);
+            }
+            rs.close();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
 
-    @Override
-    public boolean create(Specification entity) {
-        return false;
-    }
-
-    @Override
-    public Specification update(Specification entity) {
-        return null;
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String st) throws SQLException {
-        return super.prepareStatement(st);
-    }
-
-    @Override
-    public void closeStatement(PreparedStatement st) {
-        super.closeStatement(st);
+        return specifications;
     }
 
 }

@@ -7,6 +7,7 @@ public class ClientRequest extends Entity{
     private int id;
     private int idUser;
     private int idSpecification;
+    private Date requestDate;
     private Date rentalDate;
     private int rentalPeriod;
     private Date returnDate;
@@ -49,6 +50,14 @@ public class ClientRequest extends Entity{
 
     public void setIdSpecification(int idSpecification) {
         this.idSpecification = idSpecification;
+    }
+
+    public Date getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(Date requestDate) {
+        this.requestDate = requestDate;
     }
 
     public Date getRentalDate() {

@@ -22,39 +22,68 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
     private final static int PAYED_REQUESTS_STATUS = 4;
     private final static int DAMAGED_REQUESTS_STATUS = 6;
 
-    private final static String SQL_SELECT_ALL = "select * from request";
-    private final static String SQL_SELECT_BY_ID = "select * from request where id = ?";
-    private final static String SQL_SELECT_NEW_REQUESTS = "select * " +
-            "from request " +
-            "inner join specifications " +
-            "where request.idSpecification = specifications.id " +
-            "and idStatus = ? ";
+    private final static String SQL_SELECT_ALL =
+            "select * from request";
 
-    private final static String SQL_SELECT_EXPIRED_REQUESTS = "select *" +
-            "from request " +
-            "inner join specifications " +
-            "where request.idSpecification = specifications.id " +
-            "and idStatus = ? " +
-            "and CURDATE() >= rentalDate";
+    private final static String SQL_SELECT_BY_ID =
+            "select * " +
+                    "from request " +
+                    "where id = ?";
 
-    private final static String SQL_SELECT_NOT_RETURNED_CARS = "select *," +
-            "DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY) as 'expectedReturnDate'" +
-            "from request " +
-            "inner join specifications " +
-            "where request.idSpecification = specifications.id " +
-            "and idStatus = ? " +
-            "and CURDATE() > DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY)";
+    private final static String SQL_SELECT_NEW_REQUESTS =
+            "select * " +
+                    "from request " +
+                    "inner join specifications " +
+                    "where request.idSpecification = specifications.id " +
+                    "and idStatus = ? " +
+                    "and CURDATE() < rentalDate";
 
-    private final static String SQL_SELECT_DAMAGED_CARS = "select *" +
-            "from request " +
-            "inner join specifications " +
-            "where request.idSpecification = specifications.id " +
-            "and idStatus = ? ";
+    private final static String SQL_SELECT_EXPIRED_REQUESTS =
+            "select *" +
+                    "from request " +
+                    "inner join specifications " +
+                    "where request.idSpecification = specifications.id " +
+                    "and idStatus IN (" + NEW_REQUESTS_STATUS +
+                    "," + ACCEPTED_REQUESTS_STATUS +
+                    ") " +
+                    "and CURDATE() >= rentalDate";
 
-    private final static String SQL_SELECT_ALL_JOINED_SPECIFICATIONS = "select *" +
-            "FROM request " +
-            "inner join specifications " +
-            "where request.idSpecification = specifications.id ";
+    private final static String SQL_SELECT_NOT_RETURNED_CARS =
+            "select *," +
+                    "DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY) as 'expectedReturnDate'" +
+                    "from request " +
+                    "inner join specifications " +
+                    "where request.idSpecification = specifications.id " +
+                    "and idStatus = " + PAYED_REQUESTS_STATUS + " " +
+                    "and CURDATE() > DATE_ADD(rentalDate, INTERVAL rentalPeriod DAY)";
+
+    private final static String SQL_SELECT_DAMAGED_CARS =
+            "select *" +
+                    "from request " +
+                    "inner join specifications " +
+                    "where request.idSpecification = specifications.id " +
+                    "and idStatus = ? ";
+
+    private final static String SQL_SELECT_ALL_JOINED_SPECIFICATIONS =
+            "select *" +
+                    "FROM request " +
+                    "inner join specifications " +
+                    "where request.idSpecification = specifications.id ";
+
+    private final static String SQL_SELECT_OPENED_REQUESTS_ON_CAR_COUNT =
+            "select COUNT(*) as rowsCount" +
+                    "FROM request" +
+                    "WHERE idCar = ? " +
+                    "AND returnDate IS NULL";
+
+    private final static String SQL_UPDATE =
+            "UPDATE request " +
+                    "SET returnDate = ?, " +
+                    "repairCost = ?, " +
+                    "idStatus = ?, " +
+                    "statusComment = ?, " +
+                    "idCar = ? " +
+                    "WHERE id = ?";
 
     public ClientRequestDao(WrapperConnector connector) {
         super(connector);
@@ -67,7 +96,7 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
         PreparedStatement st = null;
         try {
 
-            st = prepareStatement(SQL_SELECT_ALL);
+            st = connector.prepareStatement(SQL_SELECT_ALL);
 
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -82,22 +111,24 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
             }
             log.info("Total requests count = " + requests.size());
 
+            rs.close();
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return requests;
     }
 
     @Override
-    public ClientRequest findEntityById(Integer id) throws DaoException {
+    public ClientRequest findEntityById(Integer id)
+            throws DaoException {
 
         ClientRequest clientRequest = null;
         PreparedStatement st = null;
         try {
-            st = prepareStatement(SQL_SELECT_BY_ID);
+            st = connector.prepareStatement(SQL_SELECT_BY_ID);
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -108,10 +139,11 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
                 clientRequest = new ClientRequest();
                 fillObject(clientRequest, rs);
             }
+            rs.close();
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return clientRequest;
@@ -123,35 +155,41 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
     }
 
     @Override
-    public boolean delete(ClientRequest entity) {
-        return false;
-    }
-
-    @Override
     public boolean create(ClientRequest entity) {
         return false;
     }
 
     @Override
-    public ClientRequest update(ClientRequest entity) {
-        return null;
+    public void update(ClientRequest entity)
+            throws DaoException {
+        PreparedStatement st = null;
+        try {
+            st = connector.prepareStatement(SQL_UPDATE);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        try {
+            st.setDate(1, (java.sql.Date) entity.getReturnDate());
+            st.setFloat(2, entity.getRepairCost());
+            st.setInt(3, entity.getIdStatus());
+            st.setString(4, entity.getStatusComment());
+            st.setInt(5, entity.getIdCar());
+            st.setInt(6, entity.getId());
+            log.info("update ClientRequest. Affected rows count = " + st.executeUpdate());
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
     }
 
-    @Override
-    public PreparedStatement prepareStatement(String st) throws SQLException {
-        return super.prepareStatement(st);
-    }
 
-    @Override
-    public void closeStatement(PreparedStatement st) {
-        super.closeStatement(st);
-    }
-
-
-    private void fillObject(ClientRequest clientRequest, ResultSet rs) throws SQLException {
+    private void fillObject(ClientRequest clientRequest, ResultSet rs)
+            throws SQLException {
         clientRequest.setId(rs.getInt("request.id"));
         clientRequest.setIdUser(rs.getInt("idUser"));
         clientRequest.setIdSpecification(rs.getInt("idSpecification"));
+        clientRequest.setRequestDate(rs.getDate("requestDate"));
         clientRequest.setRentalDate(rs.getDate("rentalDate"));
         clientRequest.setRentalPeriod(rs.getInt("rentalPeriod"));
         clientRequest.setReturnDate(rs.getDate("returnDate"));
@@ -167,29 +205,22 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
 
     }
 
-    public ArrayList<Composed> findJoinedWithSpecificationByStatus(int statusCode) throws DaoException {
+    public ArrayList<Composed> findJoinedWithSpecificationByStatus(int statusCode)
+            throws DaoException {
         ArrayList<Composed> requests = new ArrayList<Composed>();
 
         PreparedStatement st = null;
+
         try {
             switch (statusCode) {
                 case NEW_REQUESTS_STATUS:
-                    st = prepareStatement(SQL_SELECT_NEW_REQUESTS);
+                    st = connector.prepareStatement(SQL_SELECT_NEW_REQUESTS);
                     log.info("SQL_SELECT_NEW_REQUESTS");
                     break;
-                case ACCEPTED_REQUESTS_STATUS:
-                    st = prepareStatement(SQL_SELECT_EXPIRED_REQUESTS);
-                    log.info("SQL_SELECT_EXPIRED_REQUESTS");
-                    break;
-                case PAYED_REQUESTS_STATUS:
-                    st = prepareStatement(SQL_SELECT_NOT_RETURNED_CARS);
-                    log.info("SQL_SELECT_NOT_RETURNED_CARS");
-                    break;
                 case DAMAGED_REQUESTS_STATUS:
-                    st = prepareStatement(SQL_SELECT_DAMAGED_CARS);
+                    st = connector.prepareStatement(SQL_SELECT_DAMAGED_CARS);
                     log.info("SQL_SELECT_DAMAGED_CARS");
                     break;
-
             }
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -205,10 +236,6 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
                 Specification specification = new Specification();
                 specification.setModel(rs.getString("model"));
 
-                if (statusCode == PAYED_REQUESTS_STATUS) {
-                    clientRequest.setExpectedReturnDate(rs.getDate("expectedReturnDate"));
-                }
-
                 ComposedRequestSpecification requestSpecification = new ComposedRequestSpecification();
                 requestSpecification.setClientRequest(clientRequest);
                 requestSpecification.setSpecification(specification);
@@ -216,24 +243,111 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
                 requests.add(requestSpecification);
             }
             log.info("Requests count = " + requests.size());
+            rs.close();
 
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return requests;
 
     }
 
-    public ArrayList<Composed> findJoinedWithSpecification() throws DaoException {
+
+    public ArrayList<Composed> findJoinedWithSpecificationExpiredRequests()
+            throws DaoException {
+        ArrayList<Composed> expiredRequests = new ArrayList<Composed>();
+
+        PreparedStatement st = null;
+        try {
+
+            st = connector.prepareStatement(SQL_SELECT_EXPIRED_REQUESTS);
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+
+        try {
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                ClientRequest clientRequest = new ClientRequest();
+                fillObject(clientRequest, rs);
+
+                Specification specification = new Specification();
+                specification.setModel(rs.getString("model"));
+
+                ComposedRequestSpecification composedRequestSpecification = new ComposedRequestSpecification();
+                composedRequestSpecification.setClientRequest(clientRequest);
+                composedRequestSpecification.setSpecification(specification);
+
+                expiredRequests.add(composedRequestSpecification);
+            }
+            log.info("Total expired requests count = " + expiredRequests.size());
+            rs.close();
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
+
+        return expiredRequests;
+
+    }
+
+    public ArrayList<Composed> findJoinedWithSpecificationNotReturnedRequests()
+            throws DaoException {
+        ArrayList<Composed> notReturnedRequests = new ArrayList<Composed>();
+
+        PreparedStatement st = null;
+        try {
+
+            st = connector.prepareStatement(SQL_SELECT_NOT_RETURNED_CARS);
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+
+        try {
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                ClientRequest clientRequest = new ClientRequest();
+                fillObject(clientRequest, rs);
+                clientRequest.setExpectedReturnDate(rs.getDate("expectedReturnDate"));
+
+                Specification specification = new Specification();
+                specification.setModel(rs.getString("model"));
+
+                ComposedRequestSpecification composedRequestSpecification = new ComposedRequestSpecification();
+                composedRequestSpecification.setClientRequest(clientRequest);
+                composedRequestSpecification.setSpecification(specification);
+
+                notReturnedRequests.add(composedRequestSpecification);
+            }
+            log.info("Total not returned requests count = " + notReturnedRequests.size());
+            rs.close();
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
+
+        return notReturnedRequests;
+
+    }
+
+
+    public ArrayList<Composed> findJoinedWithSpecification()
+            throws DaoException {
         ArrayList<Composed> requests = new ArrayList<Composed>();
 
         PreparedStatement st = null;
         try {
 
-            st = prepareStatement(SQL_SELECT_ALL_JOINED_SPECIFICATIONS);
+            st = connector.prepareStatement(SQL_SELECT_ALL_JOINED_SPECIFICATIONS);
 
         } catch (SQLException e) {
             throw new DaoException(e);
@@ -255,16 +369,41 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
                 requests.add(requestSpecification);
             }
             log.info("Total specifications joined requests count = " + requests.size());
+            rs.close();
 
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
-            closeStatement(st);
+            connector.closeStatement(st);
         }
 
         return requests;
 
     }
 
+    public int countOpenedRequestsOnCar(int idCar)
+            throws DaoException {
+        int openedRequestsCount = 0;
+        PreparedStatement st = null;
+        try {
+            st = connector.prepareStatement(SQL_SELECT_OPENED_REQUESTS_ON_CAR_COUNT);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        try {
+            st.setInt(1, idCar);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                openedRequestsCount = rs.getInt("rowsCount");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
 
+        return openedRequestsCount;
+
+    }
 }

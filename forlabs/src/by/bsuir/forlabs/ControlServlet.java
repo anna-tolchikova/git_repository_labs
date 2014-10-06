@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static by.bsuir.forlabs.utilits.ExceptionPrinter.printEx;
+import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
 public class ControlServlet extends HttpServlet {
 
@@ -73,7 +73,7 @@ public class ControlServlet extends HttpServlet {
             }
         } catch (Throwable e) {
             log.error("THROWABLE! some uncatched exception occured");
-            printEx(e);
+            printException(e);
             log.info("forward to 500");
             page = ConfigurationManager.getProperty("path.page.exception");
             request.setAttribute("previousPage", referer);
@@ -118,7 +118,7 @@ public class ControlServlet extends HttpServlet {
             }
         } catch (Throwable e) {
             log.error("THROWABLE! some uncatched exception occured");
-            printEx(e);
+            printException(e);
             log.info("forward to 500");
             page = ConfigurationManager.getProperty("path.page.exception");
             request.setAttribute("previousPage", referer);

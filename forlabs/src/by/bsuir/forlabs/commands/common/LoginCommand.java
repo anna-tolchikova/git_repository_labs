@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static by.bsuir.forlabs.utilits.ExceptionPrinter.printEx;
+import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
 /**
  * command for processing user logging
@@ -54,7 +54,7 @@ public class LoginCommand implements Command {
                 }
             }
         } catch (LogicalException e) {
-            printEx(e);
+            printException(e);
         }
         return page;
     }

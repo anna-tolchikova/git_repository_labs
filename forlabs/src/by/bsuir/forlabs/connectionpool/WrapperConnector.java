@@ -12,24 +12,22 @@ public class WrapperConnector {
 
     private Connection connection;
 
-    WrapperConnector(Connection connection){
+    WrapperConnector(Connection connection) {
         this.connection = connection;
     }
 
 
     /**
-     *
      * @param sql an SQL statement that may contain one or more '?' IN
-     * parameter placeholders
+     *            parameter placeholders
      * @return a new default <code>PreparedStatement</code> object containing the
      * pre-compiled SQL statement
-     * @exception SQLException if
-     * 1. this method is called on a null connection
-     * 2. result statement is null
-     * 3. a database access error occurs
-     * 4. this method is called on a closed connection
-     * @exception IllegalArgumentException if sql statement is null or empty
-     *
+     * @throws SQLException             if
+     *                                  1. this method is called on a null connection
+     *                                  2. result statement is null
+     *                                  3. a database access error occurs
+     *                                  4. this method is called on a closed connection
+     * @throws IllegalArgumentException if sql statement is null or empty
      */
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
@@ -46,7 +44,6 @@ public class WrapperConnector {
     }
 
 
-
     public void closeStatement(PreparedStatement statement) {
         if (statement != null) {
             try {
@@ -54,8 +51,7 @@ public class WrapperConnector {
             } catch (SQLException e) {
                 log.error("Error during closing statement. " + e);
             }
-        }
-        else {
+        } else {
             log.error("Prepared statement for closing is null. ");
         }
     }
@@ -75,6 +71,20 @@ public class WrapperConnector {
 
 // другие необходимые делегированные методы интерфейса Connection
 
+
+    public void setAutoCommit(boolean autoCommit)
+            throws SQLException {
+        if (connection != null) {
+            connection.setAutoCommit(autoCommit);
+        }
+    }
+
+    public void commit()
+            throws SQLException {
+        if (connection != null) {
+            connection.commit();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

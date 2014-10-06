@@ -13,10 +13,9 @@
             <param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}: %m%n"/>
         </layout>
     </appender>
-    <logger name="app6">
-        <level value="debug"/>
-    </logger>
+
     <root>
+        <level value="debug"/>
         <appender-ref ref="TxtAppender"/>
         <appender-ref ref="ConsAppender"/>
     </root>

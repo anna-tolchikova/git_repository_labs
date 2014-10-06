@@ -9,7 +9,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import java.io.IOException;
 
-import static by.bsuir.forlabs.utilits.ExceptionPrinter.printEx;
+import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
 public class NextPageAfterErrorTag extends TagSupport {
 
@@ -37,7 +37,7 @@ public class NextPageAfterErrorTag extends TagSupport {
             }
         } catch (IOException e) {
             log.error(e);
-            printEx(e);
+            printException(e);
         }
 
         return SKIP_BODY;

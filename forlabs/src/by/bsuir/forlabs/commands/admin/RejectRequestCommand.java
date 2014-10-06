@@ -14,9 +14,9 @@ import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
  * command for processing changing locale
  */
 
-public class ApproveRequestCommand implements Command {
+public class RejectRequestCommand implements Command {
 
-    private final static Logger log = Logger.getLogger(ApproveRequestCommand.class);
+    private final static Logger log = Logger.getLogger(RejectRequestCommand.class);
 
     @Override
     public String execute(HttpServletRequest request) {
@@ -24,12 +24,13 @@ public class ApproveRequestCommand implements Command {
 
         String page = null;
 
-        String id = request.getParameter("id");
-        if (!("null").equals(id)) {
+        String id = null;
+        if ((id = request.getParameter("id")) != null && !("null").equals(id)) {
             log.info("request has parameter id = " + id);
 
             try {
-                ChangeStatusLogic.approveRequest(Integer.parseInt(id));
+                log.info("request.getParameter(\"rejectCommentArea\") = "+request.getParameter("rejectCommentArea"));
+                ChangeStatusLogic.rejectRequest(Integer.parseInt(id), request.getParameter("rejectCommentArea"));
             } catch (LogicalException e) {
                 request.getSession().setAttribute("commandError", 1);
                 printException(e);

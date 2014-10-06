@@ -11,6 +11,9 @@ public class Specification extends Entity {
     private float costPerDay;
     private String image;
 
+    private int totalCount;
+    private int freeCount;
+
     public Specification () {
 
     }
@@ -85,5 +88,21 @@ public class Specification extends Entity {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public int getFreeCount() {
+        return freeCount;
+    }
+
+    public void setFreeCount(int freeCount) {
+        this.freeCount = freeCount;
     }
 }
