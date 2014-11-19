@@ -77,14 +77,6 @@
                 </div>
 
                 <ul class="nav navbar-top-links navbar-right" style="margin-top: 15px;">
-                    <li>
-                        <form name="LocaleForm" action="${servletMap}" method="post">
-                            <a href="#" onclick="setHiddenBeBY();">BY</a> | <a  href="#" onclick="setHiddenEnUs();">ENG</a>
-                            <input type="hidden" name="localeStrI" value=""/>
-                            <input type="hidden" name="command" value="changeLocale"/>
-                            <ctg:localeForm />
-                        </form>
-                    </li>
 
                     <li class="dropdown">
                         <form  name="LogoutForm" action="${servletMap}" method="post">
@@ -191,8 +183,8 @@
                                         <thead>
                                         <tr>
                                             <th></th>
-                                            <th><fmt:message key="admin.apps.table.th.status"/></th>
                                             <th><fmt:message key="admin.apps.table.th.requestDate"/></th>
+                                            <th><fmt:message key="admin.apps.table.th.status"/></th>
                                             <th><fmt:message key="admin.apps.table.th.name"/></th>
                                             <th><fmt:message key="admin.apps.table.th.model"/></th>
                                             <th><fmt:message key="admin.apps.table.th.rentalDate"/></th>
@@ -206,8 +198,8 @@
                                         <c:forEach var="requestCl" items="${composedInfo}">
                                             <tr>
                                                 <td></td>
-                                                <td><c:out value="${requestCl.status.name}"/></td>
                                                 <td><fmt:formatDate value='${requestCl.clientRequest.requestDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
+                                                <td><c:out value="${requestCl.status.name}"/></td>
                                                 <td><c:out value="${fc:concatName(requestCl.clientRequest.firstName, requestCl.clientRequest.lastName)}"/></td>
                                                 <td><c:out value="${requestCl.specification.model}"/></td>
                                                 <td><fmt:formatDate value='${requestCl.clientRequest.rentalDate}' type='both' pattern="dd.MM.y, kk:mm:ss"/></td>
@@ -272,7 +264,7 @@
                         "orderable": false,
                         "targets": [0,8]
                     } ],
-                    "order": [[ 2, 'asc' ]]
+                    "order": [[ 1, 'asc' ]]
                 } );
 
                 t.on( 'order.dt search.dt', function () {
@@ -281,17 +273,6 @@
                     } );
                 } ).draw();
             } );
-        </script>
-
-        <script>
-            function setHiddenBeBY(){
-                document.all.localeStrI.value="be_BY";
-                document.LocaleForm.submit();
-            }
-            function setHiddenEnUs(){
-                document.all.localeStrI.value="en_US";
-                document.LocaleForm.submit();
-            }
         </script>
 
     </body>

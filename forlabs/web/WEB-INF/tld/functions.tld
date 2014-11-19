@@ -15,4 +15,10 @@
         <function-class>by.bsuir.forlabs.utilits.Functions</function-class>
         <function-signature>java.lang.String concatName(java.lang.String, java.lang.String)</function-signature>
     </function>
+
+    <function>
+        <name>isBeforeToday</name>
+        <function-class>by.bsuir.forlabs.utilits.Functions</function-class>
+        <function-signature>boolean isBeforeToday(java.util.Date)</function-signature>
+    </function>
 </taglib>

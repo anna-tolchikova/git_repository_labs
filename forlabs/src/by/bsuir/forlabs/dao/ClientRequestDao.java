@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
@@ -84,6 +85,18 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
                     "statusComment = ?, " +
                     "idCar = ? " +
                     "WHERE id = ?";
+    private final static String SQL_UPDATE_WITHOUT_ID_CAR =
+            "UPDATE request " +
+                    "SET returnDate = ?, " +
+                    "repairCost = ?, " +
+                    "idStatus = ?, " +
+                    "statusComment = ? " +
+                    "WHERE id = ?";
+    private final static String SQL_CREATE =
+            "INSERT INTO request(idUser,idSpecification,requestDate,rentalDate,\n"+
+            "rentalPeriod,serialNumber,issueDate,\n"+
+            "birthDate,firstName,lastName,idStatus)\n"+
+            "values (?,?,?,?,?,?,?,?,?,?,?)";
 
     public ClientRequestDao(WrapperConnector connector) {
         super(connector);
@@ -150,13 +163,50 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
     }
 
     @Override
+    public boolean delete(ClientRequest entity) throws DaoException {
+        return false;
+    }
+
+    @Override
     public boolean delete(Integer id) {
         return false;
     }
 
     @Override
-    public boolean create(ClientRequest entity) {
-        return false;
+    public int create(ClientRequest entity) throws DaoException {
+        log.info("request creaton");
+        int createdId = 0;
+        PreparedStatement st;
+        try {
+            st = connector.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        try {
+            st.setInt(1, entity.getIdUser());
+            st.setInt(2, entity.getIdSpecification());
+            st.setDate(3,  new java.sql.Date(entity.getRequestDate().getTime()));
+            st.setDate(4, new java.sql.Date(entity.getRentalDate().getTime()));
+            st.setInt(5, entity.getRentalPeriod());
+            st.setString(6, entity.getSerialNumber());
+            st.setDate(7, new java.sql.Date(entity.getIssueDate().getTime()));
+            st.setDate(8, new java.sql.Date(entity.getBirthDate().getTime()));
+            st.setString(9, entity.getFirstName());
+            st.setString(10, entity.getLastName());
+            st.setInt(11, entity.getIdStatus());
+            st.executeUpdate();
+            ResultSet keyset = st.getGeneratedKeys();
+            if(keyset.next()) {
+                createdId = keyset.getInt(1);
+                log.info("created id = " + createdId);
+            }
+
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            connector.closeStatement(st);
+        }
+        return createdId;
     }
 
     @Override
@@ -164,7 +214,15 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
             throws DaoException {
         PreparedStatement st = null;
         try {
-            st = connector.prepareStatement(SQL_UPDATE);
+            if (entity.getIdCar() == 0) {
+                st = connector.prepareStatement(SQL_UPDATE_WITHOUT_ID_CAR);
+                st.setInt(5, entity.getId());
+            }
+            else {
+                st = connector.prepareStatement(SQL_UPDATE);
+                st.setInt(5, entity.getIdCar());
+                st.setInt(6, entity.getId());
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
         }
@@ -173,8 +231,7 @@ public class ClientRequestDao extends AbstractDao<Integer, ClientRequest> {
             st.setFloat(2, entity.getRepairCost());
             st.setInt(3, entity.getIdStatus());
             st.setString(4, entity.getStatusComment());
-            st.setInt(5, entity.getIdCar());
-            st.setInt(6, entity.getId());
+
             log.info("update ClientRequest. Affected rows count = " + st.executeUpdate());
         } catch (SQLException e) {
             throw new DaoException(e);

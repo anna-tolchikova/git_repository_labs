@@ -29,7 +29,6 @@ public class AuthorisedUserFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         log.info("works");
-
         User user;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse  response = (HttpServletResponse)servletResponse;
@@ -37,12 +36,10 @@ public class AuthorisedUserFilter implements Filter {
         if((user =  (User)request.getSession().getAttribute("user")) != null
                 || RoutingManager.getProperty("path.page.login").equals(request.getRequestURI())
                 || request.getPathInfo() == null) {
-            log.info("user is authorised or requests login page or method='POST'");
+//            log.info("user is authorised or requests login page or method='POST'");
             filterChain.doFilter(servletRequest, servletResponse);
         }
         else {
-            log.info("user is not authorised");
-
             request.getSession().setAttribute("notAuthorised", 1);
             response.sendRedirect(RoutingManager.getProperty("path.page.login"));
         }

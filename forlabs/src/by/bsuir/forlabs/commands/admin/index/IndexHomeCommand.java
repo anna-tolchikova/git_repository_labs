@@ -2,7 +2,7 @@ package by.bsuir.forlabs.commands.admin.index;
 
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
-import by.bsuir.forlabs.logic.admin.ClientRequestsLogic;
+import by.bsuir.forlabs.logic.admin.AdminRequestsProcessingLogic;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.subjects.composers.Composed;
 import org.apache.log4j.Logger;
@@ -23,10 +23,10 @@ public class IndexHomeCommand implements Command {
         String page = null;
         try {
 
-            ArrayList<Composed> newRequests = ClientRequestsLogic.findNewRequests();
-            ArrayList<Composed> expiredRequests = ClientRequestsLogic.findExpiredRequests();
-            ArrayList<Composed> notReturnedRequests = ClientRequestsLogic.findNotReturnedRequests();
-            ArrayList<Composed> damagedRequests = ClientRequestsLogic.findDamagedRequests();
+            ArrayList<Composed> newRequests = AdminRequestsProcessingLogic.findNewRequests();
+            ArrayList<Composed> expiredRequests = AdminRequestsProcessingLogic.findExpiredRequests();
+            ArrayList<Composed> notReturnedRequests = AdminRequestsProcessingLogic.findNotReturnedRequests();
+            ArrayList<Composed> damagedRequests = AdminRequestsProcessingLogic.findDamagedRequests();
 
             request.setAttribute("newRequests", newRequests);
             request.setAttribute("expiredRequests", expiredRequests);

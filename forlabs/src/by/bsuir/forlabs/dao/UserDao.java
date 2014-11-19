@@ -36,13 +36,18 @@ public class UserDao extends AbstractDao<Integer, User> {
     }
 
     @Override
+    public boolean delete(User entity) throws DaoException {
+        return false;
+    }
+
+    @Override
     public boolean delete(Integer id) {
         return false;
     }
 
     @Override
-    public boolean create(User entity) {
-        return false;
+    public int create(User entity) {
+        return 1;
     }
 
     @Override

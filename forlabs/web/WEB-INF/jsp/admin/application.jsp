@@ -72,14 +72,7 @@
     </div>
 
     <ul class="nav navbar-top-links navbar-right" style="margin-top: 15px;">
-        <li>
-            <form name="LocaleForm" action="${servletMap}" method="post">
-                <a href="#" onclick="setHiddenBeBY();">BY</a> | <a href="#" onclick="setHiddenEnUs();">ENG</a>
-                <input type="hidden" name="localeStrI" value=""/>
-                <input type="hidden" name="command" value="changeLocale"/>
-                <ctg:localeForm/>
-            </form>
-        </li>
+
         <li class="dropdown">
 
             <form name="LogoutForm" action="${servletMap}" method="post">
@@ -190,20 +183,29 @@
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-lg-8">
+
+                    <c:if test="${ not empty sessionScope.commandError}">
+                        <div class="alert alert-danger alert-dismissable">
+                            <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+                            <c:out value="${sessionScope.commandError}"/>
+                        </div>
+                        <c:remove var="commandError" scope="session" />
+                    </c:if>
+
+                    <c:if test="${ not empty sessionScope.requiredFieldsEmpty}">
+                        <div class="alert alert-danger alert-dismissable">
+                            <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+                            <c:out value="${sessionScope.requiredFieldsEmpty}"/>
+                        </div>
+                        <c:remove var="requiredFieldsEmpty" scope="session" />
+                    </c:if>
+
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <fmt:message key="admin.app.infopanel.title"/>
                         </div>
                         <div class="panel-body">
-                            <c:if test="${ not empty sessionScope.commandError}">
-                                <div class="alert alert-danger alert-dismissable">
-                                    <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
-                                    <fmt:bundle basename="resources.messages">
-                                        <fmt:message key="message.commanderror"/>
-                                    </fmt:bundle>
-                                </div>
-                                <c:remove var="commandError" scope="session" />
-                            </c:if>
+
                             <div class="table-responsive">
                                 <table class="table">
                                     <tbody>
@@ -236,13 +238,20 @@
                                         <td><c:out value="${clientRequest.serialNumber}"/></td>
                                     </tr>
                                     <tr>
-                                        <td><fmt:message key="admin.app.label.model"/></td>
-                                        <td><c:out value="${specification.model}"/></td>
+                                        <td rowspan="2"><fmt:message key="admin.app.label.model"/></td>
+                                        <td><c:out value="${specification.model}, ${specification.year}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a style="display: inline-block; height:100%;width:100%; text-align:center;"
+                                               href="<fmt:bundle basename="resources.routing"><fmt:message key='path.page.admin.category.specifications'/></fmt:bundle>?category=${specification.idCategory}">
+                                                <fmt:message key='admin.app.a.showcategory'/>
+                                            </a>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td><fmt:message key="admin.app.label.rentaldate"/></td>
-                                        <td><fmt:formatDate value="${clientRequest.rentalDate}" type="both"
-                                                            pattern="dd.MM.y, kk:mm:ss"/></td>
+                                        <td><fmt:formatDate value="${clientRequest.rentalDate}" type="both" pattern="dd.MM.y, kk:mm:ss"/></td>
                                     </tr>
                                     <tr>
                                         <td><fmt:message key="admin.app.label.rentalperiod"/></td>
@@ -311,7 +320,7 @@
                                                     <input type="hidden" name="id" value="${clientRequest.id}"/>
                                                     <input type="hidden" name="command" value="approve_request"/>
                                                     <c:choose>
-                                                        <c:when test="${freeCarsCount == 0}">
+                                                        <c:when test="${freeCarsCount == 0 || fc:isBeforeToday(clientRequest.rentalDate)}">
                                                             <input class="btn btn-success disabled" type="submit"
                                                                    value="<fmt:message key='admin.app.buttons.approve'/>"/>
                                                         </c:when>
@@ -332,8 +341,7 @@
                                                       style="display: inline-block; height:100%;width:100%; text-align:center;">
 
                                                     <label><fmt:message key="admin.app.label.returncomment"/></label>
-                                                    <textarea class="form-control" rows="4" name="returnCommentArea">
-                                                    </textarea>
+                                                    <textarea class="form-control" rows="4" name="returnCommentArea"></textarea>
 
                                                     <input type="hidden" name="id" value="${clientRequest.id}"/>
                                                     <input type="hidden" name="command" value="return_car"/>
@@ -367,25 +375,26 @@
                             <div id="collapseReject" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <table class="table">
+                                        <form action="${servletMap}" method="post"
+                                              style="display: inline-block; height:100%;width:100%; text-align:center;">
                                         <tr>
                                             <td>
                                                 <label><fmt:message key="admin.app.rejectpanel.h1"/></label>
-                                                <textarea class="form-control" rows="4" name="rejectCommentArea">
-                                                </textarea>
+                                                <textarea class="form-control" rows="4" name="rejectCommentArea"></textarea>
                                             </td>
                                         </tr>
 
                                         <tr>
                                             <td>
-                                                <form action="${servletMap}" method="post"
-                                                      style="display: inline-block; height:100%;width:100%; text-align:center;">
+
                                                     <input type="hidden" name="id" value="${clientRequest.id}"/>
                                                     <input type="hidden" name="command" value="reject_request"/>
                                                     <input class="btn btn-outline btn-danger" type="submit"
                                                            value="<fmt:message key='admin.app.buttons.reject'/>"/>
-                                                </form>
                                             </td>
                                         </tr>
+                                        </form>
+
                                     </table>
                                 </div>
                             </div>
@@ -409,22 +418,7 @@
                             </div>
                             <div id="collapseDamagedReturn" class="panel-collapse collapse">
                                 <div class="panel-body">
-                                    <c:if test="${ not empty sessionScope.commandError}">
-                                        <div class="alert alert-danger alert-dismissable">
-                                            <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
-                                            <fmt:bundle basename="resources.messages">
-                                                <fmt:message key="message.commanderror"/>
-                                            </fmt:bundle>
-                                        </div>
-                                        <c:remove var="commandError" scope="session" />
-                                    </c:if>
-                                    <c:if test="${ not empty sessionScope.requiredFieldsEmpty}">
-                                        <div class="alert alert-warning alert-dismissable">
-                                            <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
-                                            <c:out value="${sessionScope.requiredFieldsEmpty}"/>
-                                        </div>
-                                        <c:remove var="requiredFieldsEmpty" scope="session" />
-                                    </c:if>
+
                                     <table class="table">
                                         <form action="${servletMap}" method="post">
                                             <input type="hidden" name="id" value="${clientRequest.id}"/>
@@ -434,8 +428,10 @@
                                                     <fmt:message key="admin.app.label.repaircost"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="repairCost" required min="0"
-                                                            placeholder="<fmt:formatNumber value='0' type='currency' currencySymbol='$'/>"/>
+                                                    <fmt:setLocale value="en_US"/>
+                                                    <input type="text" name="repairCost" required min="0" pattern="\d*[.]\d{1,2}"
+                                                            placeholder="<fmt:formatNumber value='0' type='currency'/>"/>
+                                                    <fmt:setLocale value="${localeStr}"/>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -443,8 +439,7 @@
                                                     <fmt:message key="admin.app.label.damagecomment"/>
                                                 </td>
                                                 <td>
-                                                    <textarea class="form-control" rows="4" name="damageDescriptionArea" required>
-                                                    </textarea>
+                                                    <textarea class="form-control" rows="4" name="damageDescriptionArea" required></textarea>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -507,19 +502,6 @@
 
 <!-- Custom Theme JavaScript -->
 <script src="${context}/js/sb-admin-2.js"></script>
-
-
-<script>
-    function setHiddenBeBY() {
-        document.all.localeStrI.value = "be_BY";
-        document.LocaleForm.submit();
-    }
-    function setHiddenEnUs() {
-        document.all.localeStrI.value = "en_US";
-        document.LocaleForm.submit();
-    }
-</script>
-
 
 <script type="text/javascript">
     $('.tooltip-demo').tooltip({

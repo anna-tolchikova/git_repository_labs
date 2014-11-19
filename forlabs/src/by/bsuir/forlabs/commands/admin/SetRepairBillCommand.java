@@ -26,18 +26,22 @@ public class SetRepairBillCommand implements Command {
         log.info("works");
 
         String page = null;
-        String id = null;
         HttpSession session = request.getSession();
-        if ((id = request.getParameter("id")) != null && !("null").equals(id)) {
+        String id = request.getParameter("id");
+
+        if ( id != null && !id.isEmpty()) {
             log.info("request has parameter id = " + id);
-            if (!request.getParameter("repairCost").isEmpty() || !request.getParameter("damageDescriptionArea").isEmpty()) {
+            int idRequest = Integer.parseInt(id);
+
+            if (request.getParameter("repairCost")!=null && !request.getParameter("damageDescriptionArea").trim().isEmpty()) {
                 try {
                     ChangeStatusLogic.setRepairBill(
-                            Integer.parseInt(id),
+                            idRequest,
                             Float.parseFloat(request.getParameter("repairCost")),
-                            request.getParameter("damageDescriptionArea"));
+                            request.getParameter("damageDescriptionArea").trim());
                 } catch (LogicalException e) {
-                    session.setAttribute("commandError", 1);
+                    session.setAttribute("commandError",
+                            new MessageManager((Locale) session.getAttribute("localeObj")).getProperty("message.commanderror"));
                     printException(e);
                 }
             }
@@ -47,7 +51,7 @@ public class SetRepairBillCommand implements Command {
             }
 
             page = RoutingManager.getProperty("path.page.admin.application");
-            page += "?id=" + id;
+            page += "?id=" + idRequest;
         }
 
 

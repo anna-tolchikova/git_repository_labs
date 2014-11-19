@@ -30,19 +30,15 @@ public class AdminPermissionFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         log.info("works");
-
         boolean hasAccessRights = false;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse  response = (HttpServletResponse)servletResponse;
         User user =  (User)request.getSession().getAttribute("user");
 
         if (user.getIdRole() == ADMIN_ROLE_CODE) {
-                log.info("user has admin rights");
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         else {
-            log.info("user has not admin rights");
-
             response.sendRedirect(RoutingManager.getProperty("path.page.error403"));
         }
     }

@@ -2,8 +2,8 @@ package by.bsuir.forlabs.commands.admin.index;
 
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
+import by.bsuir.forlabs.logic.admin.AdminRequestsProcessingLogic;
 import by.bsuir.forlabs.logic.admin.AvailableCarsLogic;
-import by.bsuir.forlabs.logic.admin.ClientRequestsLogic;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.subjects.composers.ComposedRequestSpecificationStatus;
 import org.apache.log4j.Logger;
@@ -23,18 +23,17 @@ public class IndexApplicationCommand implements Command {
         log.info("works");
 
         String page = null;
-        int id;
-
-        if (request.getParameter("id") != null || !("null".equals(request.getParameter("id")))) {
+        String id = request.getParameter("id");
+        if ( id != null && !id.isEmpty()) {
             try {
 
-                id = Integer.parseInt(request.getParameter("id"));
-                ComposedRequestSpecificationStatus composedInfo = ClientRequestsLogic.composeFullInfoById(id);
+                int idApplication = Integer.parseInt(id);
+                ComposedRequestSpecificationStatus composedInfo = AdminRequestsProcessingLogic.composeFullInfoById(idApplication);
 
                 int freeCarsCount = 0;
                 if (composedInfo.getStatus().getId() == NEW_REQUESTS_STATUS) {
                     // выбрать, сколько будет свободно машин на ту дату
-                    freeCarsCount = AvailableCarsLogic.countAvailableCarsForRequest(id);
+                    freeCarsCount = AvailableCarsLogic.countAvailableCarsForRequest(idApplication);
                     request.setAttribute("freeCarsCount", freeCarsCount);
                 }
 

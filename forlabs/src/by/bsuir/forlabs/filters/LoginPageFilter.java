@@ -32,7 +32,6 @@ public class LoginPageFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         log.info("works");
-
         boolean hasAccessRights = false;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse  response = (HttpServletResponse)servletResponse;
@@ -41,7 +40,6 @@ public class LoginPageFilter implements Filter {
         String page = null;
 
         if((user =  (User)request.getSession().getAttribute("user")) != null ) {
-            log.info("user is authorised");
             if (user.getIdRole() == ADMIN_ROLE_CODE) {
                 page = RoutingManager.getProperty("path.page.admin.home");
             }

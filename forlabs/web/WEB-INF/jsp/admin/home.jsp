@@ -82,7 +82,7 @@
                             <a href="#" onclick="setHiddenBeBY();">BY</a> | <a  href="#" onclick="setHiddenEnUs();">ENG</a>
                             <input type="hidden" name="localeStrI" value=""/>
                             <input type="hidden" name="command" value="changeLocale"/>
-                            <ctg:localeForm />
+                            <input type="hidden" name="from" value="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.home' /></fmt:bundle>" />
                         </form>
                     </li>
 

@@ -3,10 +3,13 @@ package by.bsuir.forlabs.commands.client;
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
 import by.bsuir.forlabs.logic.admin.ChangeStatusLogic;
-import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
+import by.bsuir.forlabs.resourcesmanagers.MessageManager;
+import by.bsuir.forlabs.resourcesmanagers.RoutingManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Locale;
 
 import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
@@ -23,20 +26,24 @@ public class PayForRentalCommand implements Command {
         log.info("works");
 
         String page = null;
+        HttpSession session = request.getSession();
+        String id = request.getParameter("id");
 
-        String id = null;
-        if ((id = request.getParameter("id")) != null && !("null").equals(id)) {
-            log.info("request has parameter id = " + id);
+        if ( id != null && !id.isEmpty()) {
+            int idRequest = Integer.parseInt(id);
 
             try {
-                ChangeStatusLogic.setPayedRequestsStatus(Integer.parseInt(id));
+                ChangeStatusLogic.setPayedRequestsStatus(idRequest);
+                session.setAttribute("successEdit",
+                        new MessageManager((Locale) session.getAttribute("localeObj")).getProperty("message.successEdit"));
+
             } catch (LogicalException e) {
-                request.getSession().setAttribute("commandError", 1);
+                session.setAttribute("commandError",
+                        new MessageManager((Locale) session.getAttribute("localeObj")).getProperty("message.commanderror"));
                 printException(e);
             }
 
-            page = ConfigurationManager.getProperty("path.page.admin.application");
-            page += "?id=" + id;
+            page = RoutingManager.getProperty("path.page.client.home");
         }
 
         return page;

@@ -9,9 +9,11 @@ import by.bsuir.forlabs.exceptions.LogicalException;
 import by.bsuir.forlabs.subjects.Category;
 import by.bsuir.forlabs.subjects.Specification;
 
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ShowCarsIndexLogic {
+public class ShowCategoryIndexLogic {
 
     /**
      *
@@ -61,5 +63,31 @@ public class ShowCarsIndexLogic {
         return specifications;
     }
 
+    /**
+     *
+     * @param idSpecification
+     * @return byte[] - byte representation of image or null if image was not found in db
+     * @throws LogicalException
+     */
+    public static byte[] findImage(int idSpecification)
+            throws LogicalException {
+
+        byte[] imageData = null;
+        ConnectionPool pool = ConnectionPool.getInstance();
+        WrapperConnector wc = pool.getConnection();
+        try {
+            SpecificationDao specificationDao = new SpecificationDao(wc);
+            Blob image;
+            if ((image = specificationDao.findImageBySpecificationId(idSpecification)) != null) {
+                imageData = image.getBytes(1, (int) image.length());
+            }
+        } catch (DaoException | SQLException e) {
+            throw new LogicalException(e);
+        } finally {
+            pool.releaseConnection(wc);
+        }
+
+        return imageData;
+    }
 
 }

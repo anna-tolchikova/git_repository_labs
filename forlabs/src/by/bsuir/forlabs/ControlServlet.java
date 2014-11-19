@@ -4,7 +4,6 @@ import by.bsuir.forlabs.commandfactory.CommandFactory;
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,31 +14,14 @@ import java.io.IOException;
 import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
 public class ControlServlet extends HttpServlet {
+    private int counter;
 
     private final static Logger log = Logger.getLogger(ControlServlet.class);
 
-
-    /**
-     *
-     *
-     */
-
-    @Override
-    public void init() {
-        try {
-            super.init();
-            String logConfigFilename = getInitParameter("logConfigFile");
-            String pref = "";
-            pref = getServletContext().getRealPath("/");
-            DOMConfigurator.configure(pref + logConfigFilename);
-        } catch (ServletException e) {
-            throw new RuntimeException("Error servlet initialization. ", e);
-        }
-    }
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+counter++;
         String page = null;
+
         log.info("\t POST");
         log.info("\t request uri (from request): " + request.getRequestURI()); // a String containing the part of the URL from the protocol name up to the query string
         log.info("\t request path info (from request): " + request.getPathInfo()); // a String, decoded by the web container, specifying extra path information that comes after the servlet path but before the query string in the request URL; or null if the URL does not have any extra path information
@@ -52,8 +34,14 @@ public class ControlServlet extends HttpServlet {
 
         try {
             CommandFactory factory = new CommandFactory();
-            Command command = factory.defineCommand(request);
-
+            Command command;
+            if (request.getContentType() != null && request.getContentType().toLowerCase().indexOf("multipart/form-data") > -1 ) {
+                request.setAttribute("command", "add_specifications");
+                command = factory.defineCommand(request);
+            }
+            else {
+                command = factory.defineCommand(request);
+            }
             log.info("command = " + command);
 
             page = command.execute(request);   // пути как в роутинге

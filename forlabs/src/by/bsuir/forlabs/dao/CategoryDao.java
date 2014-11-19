@@ -65,13 +65,18 @@ public class CategoryDao extends AbstractDao<Integer, Category> {
     }
 
     @Override
+    public boolean delete(Category entity) throws DaoException {
+        return false;
+    }
+
+    @Override
     public boolean delete(Integer id) {
         return false;
     }
 
     @Override
-    public boolean create(Category entity) {
-        return false;
+    public int create(Category entity) {
+        return 1;
     }
 
     @Override

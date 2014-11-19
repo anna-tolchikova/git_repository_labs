@@ -15,7 +15,7 @@ import by.bsuir.forlabs.subjects.composers.ComposedRequestSpecificationStatus;
 
 import java.util.ArrayList;
 
-public class ClientRequestsLogic {
+public class AdminRequestsProcessingLogic {
 
     private final static int NEW_REQUESTS_STATUS = 1;
     private final static int DAMAGED_REQUESTS_STATUS = 6;
@@ -131,11 +131,22 @@ public class ClientRequestsLogic {
             if (clientRequest != null) {
                 composedInfo = new ComposedRequestSpecificationStatus();
                 Status status = statusDao.findEntityById(clientRequest.getIdStatus());
-                Specification specification = specificationDao.findEntityById(clientRequest.getIdSpecification());
+                if (status != null) {
+                    Specification specification = specificationDao.findEntityById(clientRequest.getIdSpecification());
+                    if (specification != null) {
 
-                composedInfo.setClientRequest(clientRequest);
-                composedInfo.setStatus(status);
-                composedInfo.setSpecification(specification);
+                        composedInfo.setClientRequest(clientRequest);
+                        composedInfo.setStatus(status);
+                        composedInfo.setSpecification(specification);
+
+                    }
+                    else {
+                        throw new LogicalException("Specifications with id = " + clientRequest.getIdSpecification() + " doesn't exist");
+                    }
+                }
+                else {
+                    throw new LogicalException("Status with id = " + clientRequest.getIdStatus() + " doesn't exist");
+                }
             } else {
                 throw new LogicalException("Request with id = " + id + " doesn't exist");
             }

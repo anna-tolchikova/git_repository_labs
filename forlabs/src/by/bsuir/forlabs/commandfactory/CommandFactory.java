@@ -14,7 +14,6 @@ public class CommandFactory {
 
         Command current = new EmptyCommand();
 
-
         String action;
         if ((action = request.getParameter("command")) == null || action.isEmpty()) {  // если команда не задана в текущем запросе
             if (( action = (String)request.getAttribute("command")) == null || action.isEmpty()) {

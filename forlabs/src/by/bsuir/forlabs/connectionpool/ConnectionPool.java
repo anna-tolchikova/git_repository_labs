@@ -36,6 +36,9 @@ public class ConnectionPool {
     private ArrayList<WrapperConnector>     connections;
     private HashMap<WrapperConnector, Long> connectionsLastUsingMap;
     private AtomicInteger                   currentPoolSize;
+    private Timer timer;
+
+    static boolean instanceCreated = false;
 
     private ConnectionPool(){
 
@@ -63,7 +66,7 @@ public class ConnectionPool {
             log.info(i+1 + ") connection created \n\t poolSize = " + currentPoolSize);
         }
 
-        Timer timer = new Timer();
+        timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
 
             @Override
@@ -91,6 +94,7 @@ public class ConnectionPool {
 
         }, FIRST_DELAY_PERIOD_MSEC, REPEAT_TASK_DELAY_PERIOD_MSEC);
 
+        instanceCreated = true;
     }
 
     private static class SingletonLazyLoader {
@@ -101,7 +105,7 @@ public class ConnectionPool {
      *
      * @return ConnectionPool single for all clients object
      */
-    public synchronized static ConnectionPool getInstance() {
+    public static ConnectionPool getInstance() {
         return SingletonLazyLoader.INSTANCE;
     }
 
@@ -198,6 +202,13 @@ public class ConnectionPool {
             notEmpty.signal();
         } finally {
             lock.unlock();
+        }
+    }
+
+    void closeConnections() {
+        timer.cancel();
+        for (WrapperConnector connection: connections) {
+            connection.closeConnection();
         }
     }
 

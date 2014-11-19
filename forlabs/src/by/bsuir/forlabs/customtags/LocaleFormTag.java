@@ -2,6 +2,7 @@ package by.bsuir.forlabs.customtags;
 
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -23,16 +24,18 @@ public class LocaleFormTag extends TagSupport{
 
         JspWriter out = pageContext.getOut();
 
-        String formParameterFrom = (String) pageContext.getRequest().getAttribute("javax.servlet.forward.request_uri");
-        String formParameterId = null;
+//        String formParameterFrom = (String) pageContext.getRequest().getAttribute("javax.servlet.forward.request_uri");
+        String referer = ((HttpServletRequest)pageContext.getRequest()).getHeader("Referer");
+        log.info("referer = " + referer);
+        String from = referer.substring("http://localhost:7075".length());
+        log.info("from = " + from);
 
         try {
-            out.write("<input type=\"hidden\" name=\"from\" value=\"" + formParameterFrom + "\">");
-            if((formParameterId = pageContext.getRequest().getParameter("id")) != null) {
-                out.write("<input type=\"hidden\" name=\"id\" value=\"" + formParameterId + "\">");
-            }
+            out.write("<input type=\"hidden\" name=\"from\" value=\"" + from + "\">");
+//            if((formParameterId = pageContext.getRequest().getParameter("id")) != null) {
+//                out.write("<input type=\"hidden\" name=\"id\" value=\"" + formParameterId + "\">");
+//            }
         } catch (IOException e) {
-            log.error(e);
             printException(e);
         }
 

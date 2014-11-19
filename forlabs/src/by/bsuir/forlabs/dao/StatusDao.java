@@ -27,13 +27,6 @@ public class StatusDao extends AbstractDao<Integer, Status> {
         return null;
     }
 
-
-    private void fillObject (Status status, ResultSet rs) throws SQLException {
-        status.setId(rs.getInt("id"));
-        status.setName(rs.getString("name"));
-        status.setDescription(rs.getString("description"));
-    }
-
     @Override
     public Status findEntityById(Integer id) throws DaoException {
 
@@ -68,8 +61,13 @@ public class StatusDao extends AbstractDao<Integer, Status> {
     }
 
     @Override
-    public boolean create(Status entity) {
+    public boolean delete(Status entity) throws DaoException {
         return false;
+    }
+
+    @Override
+    public int create(Status entity) {
+        return 1;
     }
 
     @Override
@@ -77,5 +75,10 @@ public class StatusDao extends AbstractDao<Integer, Status> {
 
     }
 
+    private void fillObject (Status status, ResultSet rs) throws SQLException {
+        status.setId(rs.getInt("id"));
+        status.setName(rs.getString("name"));
+        status.setDescription(rs.getString("description"));
+    }
 
 }

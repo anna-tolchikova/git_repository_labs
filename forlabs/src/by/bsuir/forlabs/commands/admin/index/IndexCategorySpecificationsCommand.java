@@ -2,12 +2,10 @@ package by.bsuir.forlabs.commands.admin.index;
 
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
-import by.bsuir.forlabs.logic.admin.ClientRequestsLogic;
-import by.bsuir.forlabs.logic.admin.ShowCarsIndexLogic;
+import by.bsuir.forlabs.logic.admin.ShowCategoryIndexLogic;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.subjects.Category;
 import by.bsuir.forlabs.subjects.Specification;
-import by.bsuir.forlabs.subjects.composers.ComposedRequestSpecificationStatus;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,17 +22,21 @@ public class IndexCategorySpecificationsCommand implements Command {
         log.info("works");
         String page = null;
         try {
-            if (!request.getParameter("category").isEmpty()) {
+            String id = request.getParameter("category");
+            if ( id != null && !id.isEmpty()) {
 
-                Category category = ShowCarsIndexLogic.findCategory(Integer.parseInt(request.getParameter("category")));
+                int idCategory =  Integer.parseInt(id);
+                Category category = ShowCategoryIndexLogic.findCategory(idCategory);
                 if (category != null) {
 
-                    ArrayList<Specification> specificationsInCategory = ShowCarsIndexLogic.findSpecificationsByCategory(category);
-                    // для хэдера
+                    ArrayList<Specification> specificationsInCategory = ShowCategoryIndexLogic.findSpecificationsByCategory(category);
+
                     request.setAttribute("category", category);
-                    // прислать specificationsInCategory для таблицы
                     request.setAttribute("specificationsInCategory", specificationsInCategory);
                     page = ConfigurationManager.getProperty("path.page.admin.category.specifications");
+                }
+                else {
+                    log.error("Category with id = " + idCategory + " doesn't exist");
                 }
 
             }

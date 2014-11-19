@@ -2,7 +2,7 @@ package by.bsuir.forlabs.commands.admin.index;
 
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
-import by.bsuir.forlabs.logic.admin.ClientRequestsLogic;
+import by.bsuir.forlabs.logic.admin.AdminRequestsProcessingLogic;
 import by.bsuir.forlabs.resourcesmanagers.ConfigurationManager;
 import by.bsuir.forlabs.subjects.composers.ComposedRequestSpecificationStatus;
 import org.apache.log4j.Logger;
@@ -24,8 +24,7 @@ public class IndexApplicationsCommand implements Command {
 
         try {
 
-            ArrayList<ComposedRequestSpecificationStatus> composedInfo = ClientRequestsLogic.composeFullInfo();
-
+            ArrayList<ComposedRequestSpecificationStatus> composedInfo = AdminRequestsProcessingLogic.composeFullInfo();
             request.setAttribute("composedInfo", composedInfo);
             page = ConfigurationManager.getProperty("path.page.admin.applications");
 

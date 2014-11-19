@@ -13,7 +13,7 @@
 <fmt:setBundle basename="resources.text" />
 
 <c:set var="servletMap" value="${initParam['map']}"/>
-
+<c:set var="imagesMap" value="${initParam['imagesMap']}"/>
 <c:set var="context" value="${pageContext.request.contextPath}"> </c:set>
 
 
@@ -25,7 +25,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title><fmt:message key='admin.cars.title' /></title>
+        <title><fmt:message key='admin.specifications.title' /></title>
 
         <!-- Bootstrap Core CSS -->
         <link href="${context}/css/bootstrap.min.css" rel="stylesheet">
@@ -52,6 +52,11 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
+        <style>
+            #allCarsTable td{
+                padding: 3px;
+            }
+        </style>
     </head>
     <body>
 
@@ -71,14 +76,6 @@
                 </div>
 
                 <ul class="nav navbar-top-links navbar-right" style="margin-top: 15px;">
-                    <li>
-                        <form name="LocaleForm" action="${servletMap}" method="post">
-                            <a href="#" onclick="setHiddenBeBY();">BY</a> | <a  href="#" onclick="setHiddenEnUs();">ENG</a>
-                            <input type="hidden" name="localeStrI" value=""/>
-                            <input type="hidden" name="command" value="changeLocale"/>
-                            <ctg:localeForm />
-                        </form>
-                    </li>
 
                     <li class="dropdown">
                         <form  name="LogoutForm" action="${servletMap}" method="post">
@@ -169,9 +166,6 @@
                 <!-- /.row -->
 
 
-
-
-
                 <div class="row">
                     <div class="col-lg-12">
 
@@ -192,7 +186,6 @@
                                         <tr>
                                             <th></th>
                                             <th><fmt:message key="admin.specifications.table.th.model"/></th>
-                                            <th><fmt:message key="admin.specifications.table.th.producer"/></th>
                                             <th><fmt:message key="admin.specifications.table.th.year"/></th>
                                             <th><fmt:message key="admin.specifications.table.th.totalCount"/></th>
                                             <th><fmt:message key="admin.specifications.table.th.freeCount"/></th>
@@ -205,11 +198,10 @@
                                             <tr>
                                                 <td></td>
                                                 <td><c:out value="${specifications.model}"/></td>
-                                                <td><c:out value="${specifications.producer}"/></td>
                                                 <td><c:out value="${specifications.year}"/></td>
                                                 <td><c:out value='${specifications.totalCount}'/></td>
                                                 <td><c:out value='${specifications.freeCount}'/></td>
-                                                <td><img src="${pageContext.servletContext.getRealPath(specifications.image)}"/></td>
+                                                <td><img style="max-width: 400px; max-height: 400px; " src="${imagesMap}?id=${specifications.id}"/></td>
                                                 <td  class="center">
                                                     <a style="display: inline-block; height:100%;width:100%; text-align:center;"
                                                        href="<fmt:bundle basename='resources.routing'><fmt:message key='path.page.admin.specifications.cars'/></fmt:bundle>?id=${specifications.id}">
@@ -222,7 +214,7 @@
                                     </table>
                                 </div>
                                 <!-- /.table-responsive -->
-
+C
                             </div>
                             <!-- /.panel-body -->
                         </div>
@@ -266,9 +258,9 @@
                     "columnDefs": [ {
                         "searchable": false,
                         "orderable": false,
-                        "targets": [0,7]
+                        "targets": [0,6]
                     } ],
-                    "order": [[ 2, 'asc' ]]
+                    "order": [[ 1, 'asc' ]]
                 } );
 
                 t.on( 'order.dt search.dt', function () {
@@ -277,17 +269,6 @@
                     } );
                 } ).draw();
             } );
-        </script>
-
-        <script>
-            function setHiddenBeBY(){
-                document.all.localeStrI.value="be_BY";
-                document.LocaleForm.submit();
-            }
-            function setHiddenEnUs(){
-                document.all.localeStrI.value="en_US";
-                document.LocaleForm.submit();
-            }
         </script>
 
     </body>

@@ -2,9 +2,13 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-           version="2.5" metadata-complete="true">
+		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+           version="3.0" metadata-complete="true">
 
+    <context-param>
+        <param-name>logConfigFile</param-name>
+        <param-value>/xml/log4j.xml</param-value>
+    </context-param>
 
     <context-param>
         <param-name>localeStr</param-name>
@@ -16,25 +20,39 @@
         <param-value>/site</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>imagesMap</param-name>
+        <param-value>/images/cars</param-value>
+    </context-param>
+
     <listener>
         <listener-class>by.bsuir.forlabs.listeners.SessionListener</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>by.bsuir.forlabs.connectionpool.ContextListener</listener-class>
     </listener>
 
     <servlet>
         <servlet-name>ControlServlet</servlet-name>
         <servlet-class>by.bsuir.forlabs.ControlServlet</servlet-class>
 
-        <init-param>
-            <param-name>logConfigFile</param-name>
-            <param-value>/xml/log4j.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>ControlServlet</servlet-name>
         <url-pattern>/site/*</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>ImageServlet</servlet-name>
+        <servlet-class>by.bsuir.forlabs.ImageServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ImageServlet</servlet-name>
+        <url-pattern>/images/cars/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

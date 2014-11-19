@@ -1,7 +1,10 @@
 package by.bsuir.forlabs.subjects;
 
+import org.apache.commons.fileupload.FileItem;
+
 public class Specification extends Entity {
     private int id;
+    private int idCategory;
     private String producer;
     private String model;
     private int year;
@@ -9,7 +12,7 @@ public class Specification extends Entity {
     private String fuelType;
     private int engineCapacity;
     private float costPerDay;
-    private String image;
+    private FileItem image;
 
     private int totalCount;
     private int freeCount;
@@ -24,6 +27,14 @@ public class Specification extends Entity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getIdCategory() {
+        return idCategory;
+    }
+
+    public void setIdCategory(int idCategory) {
+        this.idCategory = idCategory;
     }
 
     public String getProducer() {
@@ -82,11 +93,11 @@ public class Specification extends Entity {
         this.costPerDay = costPerDay;
     }
 
-    public String getImage() {
+    public FileItem getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(FileItem image) {
         this.image = image;
     }
 

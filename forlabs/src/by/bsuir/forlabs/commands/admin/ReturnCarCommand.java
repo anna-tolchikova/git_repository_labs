@@ -3,10 +3,14 @@ package by.bsuir.forlabs.commands.admin;
 import by.bsuir.forlabs.commands.Command;
 import by.bsuir.forlabs.exceptions.LogicalException;
 import by.bsuir.forlabs.logic.admin.ChangeStatusLogic;
+import by.bsuir.forlabs.resourcesmanagers.MessageManager;
 import by.bsuir.forlabs.resourcesmanagers.RoutingManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import java.util.Locale;
 
 import static by.bsuir.forlabs.utilits.ExceptionsPrintWrapper.printException;
 
@@ -23,20 +27,23 @@ public class ReturnCarCommand implements Command {
         log.info("works");
 
         String page = null;
+        HttpSession session = request.getSession();
+        String id = request.getParameter("id");
 
-        String id = null;
-        if ((id = request.getParameter("id")) != null && !("null").equals(id)) {
+        if ( id != null && !id.isEmpty()) {
             log.info("request has parameter id = " + id);
+            int idRequest = Integer.parseInt(id);
 
             try {
-                ChangeStatusLogic.returnCar(Integer.parseInt(id), request.getParameter("returnCommentArea"));
+                ChangeStatusLogic.returnCar(idRequest, request.getParameter("returnCommentArea"));
             } catch (LogicalException e) {
-                request.getSession().setAttribute("commandError", 1);
+                session.setAttribute("commandError",
+                        new MessageManager((Locale) session.getAttribute("localeObj")).getProperty("message.commanderror"));
                 printException(e);
             }
 
             page = RoutingManager.getProperty("path.page.admin.application");
-            page += "?id=" + id;
+            page += "?id=" + idRequest;
         }
 
         return page;

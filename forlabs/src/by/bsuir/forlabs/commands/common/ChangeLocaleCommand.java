@@ -29,17 +29,7 @@ public class ChangeLocaleCommand implements Command {
         session.setAttribute("localeStr", localeStr);
         Locale localeObj = new Locale(localeParts[0], localeParts[1]);
         session.setAttribute("localeObj", localeObj);
-
-        if ((page = (String) request.getParameter("from")) != null) {
-            // если меняем локаль на странице конкретной заявки или автомобиля (есть параметр id), то нужно вновь попасть на нее
-            // page не устанавливатся через request.getRequestURI() + "?" + request.getQueryString() т.к. весь запрос повторять не стоит
-            String id = null;
-            if ((id = request.getParameter("id")) != null && !("null").equals(id)) {
-                log.info("request has parameter id = " + id);
-                page += "?id=" + id;               // 2 ой вариант - добавить параметр к uri
-            }
-        }
-
+        page = (String) request.getParameter("from");
         return page;
     }
 }
